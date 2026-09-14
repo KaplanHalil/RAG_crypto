@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kriptoanaliz & Kriptografi RAG Sistemi</title>
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-dark: #0a0d14;
+            --bg-card: #121824;
+            --bg-card-hover: #182234;
+            --accent-cyan: #00f2fe;
+            --accent-blue: #4facfe;
+            --accent-gold: #ffb703;
+            --accent-emerald: #00f5d4;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: #1e293b;
+            --border-glow: rgba(0, 242, 254, 0.3);
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(0, 242, 254, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(255, 183, 3, 0.05) 0%, transparent 40%);
+        }
+
+        /* Top Header Navigation */
+        header {
+            background: rgba(18, 24, 36, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+        }
+
+        .logo-text h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, #fff, var(--text-muted));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text p {
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            font-family: 'Fira Code', monospace;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .stat-badge {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border-color);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-badge i {
+            color: var(--accent-cyan);
+        }
+
+        /* Main Container & Tabs */
+        main {
+            flex: 1;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            background: var(--bg-card);
+            padding: 6px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            width: fit-content;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(79, 172, 254, 0.15));
+            color: var(--accent-cyan);
+            border: 1px solid var(--border-glow);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* RAG Chat Layout */
+        .chat-container {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 1.5rem;
+            height: calc(100vh - 200px);
+        }
+
+        @media (max-width: 1024px) {
+            .chat-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+        }
+
+        .chat-main {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-history {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            max-width: 90%;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .message.user .avatar {
+            background: var(--accent-gold);
+            color: #000;
+        }
+
+        .message.assistant .avatar {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: #000;
+        }
+
+        .bubble {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .message.user .bubble {
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.2), rgba(0, 242, 254, 0.1));
+            border-color: var(--border-glow);
+        }
+
+        .bubble pre {
+            background: #090d16;
+            padding: 0.8rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            margin: 0.8rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Sources Box under answer */
+        .source-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .source-chip {
+            background: rgba(0, 242, 254, 0.1);
+            border: 1px solid var(--border-glow);
+            color: var(--accent-cyan);
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-family: 'Fira Code', monospace;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .source-chip:hover {
+            background: var(--accent-cyan);
+            color: #000;
+        }
+
+        .chat-input-box {
+            padding: 1rem;
+            background: rgba(10, 13, 20, 0.8);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-box input {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            outline: none;
+            transition: border 0.2s ease;
+        }
+
+        .chat-input-box input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+        }
+
+        .btn-send {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: #000;
+            border: none;
+            padding: 0 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: opacity 0.2s ease;
+        }
+
+        .btn-send:hover {
+            opacity: 0.9;
+        }
+
+        /* Sidebar Controls */
+        .chat-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .sidebar-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.2rem;
+        }
+
+        .sidebar-card h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .form-group select, .form-group input[type="range"] {
+            width: 100%;
+            background: #0a0d14;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        /* How it works info cards */
+        .info-step-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.2rem;
+            margin-top: 1rem;
+        }
+
+        .step-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: rgba(0, 242, 254, 0.15);
+            position: absolute;
+            top: 10px;
+            right: 15px;
+        }
+
+        .step-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Grid cards for RFC / Articles */
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 1rem;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: var(--border-glow);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+
+        .card-badge {
+            background: rgba(0, 242, 254, 0.1);
+            color: var(--accent-cyan);
+            font-size: 0.75rem;
+            font-family: 'Fira Code', monospace;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            margin-top: 6px;
+        }
+
+        .card-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .btn-action {
+            width: 100%;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-action:hover {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: #000;
+            border-color: transparent;
+        }
+
+        .btn-delete {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-delete:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        /* Ingestion Input Bar */
+        .ingest-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .ingest-box input, .ingest-box select {
+            flex: 1;
+            background: #0a0d14;
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: #fff;
+            outline: none;
+        }
+
+        .loader {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            border-top: 3px solid var(--accent-cyan);
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Summary Container */
+        .summary-output {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius);
+            padding: 1.8rem;
+            margin-top: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .summary-output h2 {
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <div class="logo-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="logo-text">
+                <h1>KRİPTOANALİZ & KRİPTOGRAFİ RAG SİSTEMİ</h1>
+                <p>OLLAMA YEREL VEKTÖR ARAMA VE ATIF MOTORU</p>
+            </div>
+        </div>
+
+        <div class="header-stats">
+            <div class="stat-badge">
+                <i class="fa-solid fa-database"></i>
+                <span id="stat-chunks">0</span> Parça (Chunk)
+            </div>
+            <div class="stat-badge">
+                <i class="fa-solid fa-scroll"></i>
+                <span id="stat-rfcs">0</span> RFC Standardı
+            </div>
+            <div class="stat-badge">
+                <i class="fa-solid fa-newspaper"></i>
+                <span id="stat-articles">0</span> Makale
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('chat')">
+                <i class="fa-solid fa-comments"></i> RAG Sohbet Stüdyosu
+            </button>
+            <button class="tab-btn" onclick="switchTab('about')">
+                <i class="fa-solid fa-circle-info"></i> Program Nasıl Çalışır?
+            </button>
+            <button class="tab-btn" onclick="switchTab('library')">
+                <i class="fa-solid fa-book-bookmark"></i> Kütüphane (RFC & Makaleler)
+            </button>
+            <button class="tab-btn" onclick="switchTab('summarizer')">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Doküman Özetleyici
+            </button>
+            <button class="tab-btn" onclick="switchTab('ingester')">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Web & Dosya Yükleyici
+            </button>
+        </div>
+
+        <!-- SEKME 1: RAG CHAT -->
+        <div id="tab-chat" class="tab-content active">
+            <div class="chat-container">
+                <div class="chat-main">
+                    <div class="chat-history" id="chat-history">
+                        <div class="message assistant">
+                            <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+                            <div class="bubble">
+                                Hoş geldiniz! <strong>Kriptoanaliz & Kriptografi RAG Sistemi</strong> kullanımınıza hazırdır.
+                                <br><br>
+                                Veri tabanına önceden yüklenmiş <strong>Diferansiyel ve Lineer Kriptoanaliz, Yan Kanal Saldırıları (DPA), LLL Kafes Saldırıları, Bleichenbacher RSA Padding Oracle</strong> gibi dönüm noktası makaleler ve <strong>TLS 1.3, ChaCha20-Poly1305, HMAC</strong> RFC standartları mevcuttur.
+                                <br><br>
+                                Aşağıdaki kutudan yerel yapay zeka modelinize Türkçe veya İngilizce teknik sorular sorabilirsiniz!
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input-box">
+                        <input type="text" id="user-input" placeholder="Diferansiyel Kriptoanaliz nedir?, TLS 1.3 anahtar değişimi nasıl çalışır?..." onkeypress="handleKeyPress(event)">
+                        <button class="btn-send" onclick="sendQuery()">
+                            <i class="fa-solid fa-paper-plane"></i> Sorgula
+                        </button>
+                    </div>
+                </div>
+
+                <div class="chat-sidebar">
+                    <div class="sidebar-card">
+                        <h3><i class="fa-solid fa-sliders"></i> Motor Ayarları</h3>
+                        <div class="form-group">
+                            <label>Ollama Yapay Zeka Modeli</label>
+                            <select id="model-select">
+                                <option value="llama3.1:8b">llama3.1:8b</option>
+                                <option value="gemma4:26b">gemma4:26b</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Getirilecek Vektör Parçası (Top-K): <span id="top-k-val" style="color:var(--accent-cyan)">5</span></label>
+                            <input type="range" id="top-k-slider" min="1" max="15" value="5" oninput="document.getElementById('top-k-val').innerText = this.value">
+                        </div>
+                        <div class="form-group">
+                            <label>Doküman Filtresi</label>
+                            <select id="filter-select">
+                                <option value="All">Tüm Dokümanlar</option>
+                                <option value="RFC Document">Yalnızca RFC Standartları</option>
+                                <option value="Cryptanalysis Paper">Yalnızca Kriptoanaliz Makaleleri</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-card">
+                        <h3><i class="fa-solid fa-lightbulb"></i> Örnek Teknik Sorgular</h3>
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                            <button class="btn-action" style="font-size:0.8rem; text-align:left;" onclick="fillQuery('Diferansiyel Kriptoanaliz nedir ve S-Box tasarımı bunu nasıl engeller?')">
+                                🔑 Diferansiyel Kriptoanaliz & S-Box
+                            </button>
+                            <button class="btn-action" style="font-size:0.8rem; text-align:left;" onclick="fillQuery('TLS 1.2 ile TLS 1.3 arasındaki temel güvenlik ve kriptografik farklar nelerdir?')">
+                                🔐 TLS 1.2 vs TLS 1.3 Güvenliği
+                            </button>
+                            <button class="btn-action" style="font-size:0.8rem; text-align:left;" onclick="fillQuery('Bleichenbacher Padding Oracle saldırısı RSA PKCS#1 v1.5 sistemlerini nasıl kırar?')">
+                                ⚔️ Bleichenbacher Padding Oracle
+                            </button>
+                            <button class="btn-action" style="font-size:0.8rem; text-align:left;" onclick="fillQuery('Mitsuru Matsui Linear Cryptanalysis yöntemi ve Piling-up Lemma nasıl çalışır?')">
+                                📐 Matsui Lineer Kriptoanaliz
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEKME 2: PROGRAM NASIL ÇALIŞIR? -->
+        <div id="tab-about" class="tab-content">
+            <div class="sidebar-card" style="margin-bottom:1.5rem;">
+                <h2 style="color:var(--accent-cyan); font-size:1.4rem; margin-bottom:0.8rem;">
+                    <i class="fa-solid fa-microchip"></i> Kriptoanaliz RAG Sisteminin Çalışma Prensibi
+                </h2>
+                <p style="color:var(--text-muted); line-height:1.7;">
+                    Bu uygulama, <strong>Retrieval-Augmented Generation (RAG)</strong> mimarisini yerel Yapay Zeka modelleriniz (**Ollama**) ile birleştirerek kriptografi ve kriptoanaliz belgeleri üzerinde yüksek doğruluklu, kaynak atıflı yanıtlar verir. Sistemin arkasındaki işlem adımları aşağıda açıklanmıştır:
+                </p>
+            </div>
+
+            <div class="info-step-grid">
+                <div class="step-card">
+                    <div class="step-number">01</div>
+                    <div class="step-title"><i class="fa-solid fa-file-contract"></i> Doküman Bölme (Chunking)</div>
+                    <div class="step-desc">
+                        Yüklenen makaleler, RFC standartları veya web sayfaları anlamsal paragraf bütünlüğü korunarak 1000 karakterlik küçük parçalara (chunks) bölünür.
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">02</div>
+                    <div class="step-title"><i class="fa-solid fa-network-wired"></i> Vektör Gömme (Embeddings)</div>
+                    <div class="step-desc">
+                        Bölünen her metin parçası, Ollama üzerindeki <code>nomic-embed-text</code> modeli aracılığıyla 768 boyutlu matematiksel sayısal vektörlere dönüştürülür.
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">03</div>
+                    <div class="step-title"><i class="fa-solid fa-database"></i> ChromaDB Veri Depolama</div>
+                    <div class="step-desc">
+                        Vektörler ve metadata bilgileri (başlık, URL, doküman türü) yerel ChromaDB vektör veri tabanında saklanır.
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">04</div>
+                    <div class="step-title"><i class="fa-solid fa-magnifying-glass-chart"></i> Anlamsal Arama (Retrieval)</div>
+                    <div class="step-desc">
+                        Soru sorduğunuzda sorunuz vektörleştirilir ve veri tabanındaki en alakalı metin parçaları kosinüs benzerliği metriğiyle (Cosine Similarity) anında bulunur.
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">05</div>
+                    <div class="step-title"><i class="fa-solid fa-brain"></i> Ollama LLM Yanıtı & Atıf</div>
+                    <div class="step-desc">
+                        Yerel modeliniz (örneğin <code>llama3.1:8b</code> veya <code>qwen3.8:27b</code>), yalnızca bulunan bu kaynak bilgileri kullanarak doğru ve kaynak gösterimli yanıt oluşturur.
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-card" style="margin-top:1.5rem;">
+                <h3><i class="fa-solid fa-shield-check"></i> Öne Çıkan Avantajlar</h3>
+                <ul style="color:var(--text-muted); line-height:1.8; margin-left:1.2rem;">
+                    <li><strong>Tamamen Çevrimdışı ve Gizli:</strong> Tüm veriler ve yapay zeka modelleri kendi bilgisayarınızda çalışır, dışarıya veri gönderilmez.</li>
+                    <li><strong>Sıfır Halüsinasyon (Zero Hallucination):</strong> Model yalnızca veri tabanından getirilen gerçek RFC ve makale içeriklerine dayanarak yanıt verir.</li>
+                    <li><strong>Doğrudan Atıf Gösterimi:</strong> Üretilen yanıtların altında hangi makaleden veya RFC bölümünden yararlanıldığı (ör. <code>[SOURCE 1]</code>) açıkça görünür.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SEKME 3: KÜTÜPHANE (RFC & MAKALELER) -->
+        <div id="tab-library" class="tab-content">
+            <div class="ingest-box" style="margin-bottom:1rem;">
+                <select id="library-filter" onchange="filterLibraryGrid()">
+                    <option value="all">Tüm Dokümanlar (RFC Standartları & Kriptoanaliz Makaleleri)</option>
+                    <option value="papers">Yalnızca Atıf Almış Kriptoanaliz Makaleleri</option>
+                    <option value="rfcs">Yalnızca IETF RFC Standartları</option>
+                </select>
+            </div>
+
+            <h2 style="font-size:1.1rem; margin-bottom:1rem; color:var(--text-muted);" id="library-section-title">SEÇİLİ KÜTÜPHANE İÇERİKLERİ</h2>
+            <div class="grid-cards" id="library-grid">
+                <!-- Dynamically Populated -->
+            </div>
+        </div>
+
+        <!-- SEKME 4: DOKÜMAN ÖZETLEYİCİ -->
+        <div id="tab-summarizer" class="tab-content">
+            <div class="ingest-box" style="flex-direction:column; align-items:stretch;">
+                <h3 style="color:var(--accent-cyan); font-size:1.1rem; margin-bottom:0.5rem;">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> İndekslenmiş Doküman Özetleme Modülü
+                </h3>
+                <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1rem;">
+                    Veri tabanındaki herhangi bir makaleyi veya RFC dokümanını seçerek yerel yapay zeka modelinizden detaylı Türkçe teknik özet isteyebilirsiniz.
+                </p>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px;">
+                    <div>
+                        <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Özetlenecek Dokümanı Seçin</label>
+                        <select id="summary-doc-select">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+
+                    <div>
+                        <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Özet Odak Noktası</label>
+                        <select id="summary-type-select">
+                            <option value="general">Genel Kapsamlı ve Teknik Özet</option>
+                            <option value="attacks">Saldırı Yöntemleri & Karmaşıklık Odaklı</option>
+                            <option value="standards">Kriptografik Protokol Standartları Odaklı</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Yapay Zeka Modeli</label>
+                        <select id="summary-model-select">
+                            <option value="llama3.1:8b">llama3.1:8b</option>
+                            <option value="gemma4:26b">gemma4:26b</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn-send" style="margin-top:1rem; height:45px; justify-content:center;" onclick="generateSummary()">
+                    <i class="fa-solid fa-file-contract"></i> Dokümanı Türkçe Özetle
+                </button>
+            </div>
+
+            <div id="summary-result-box" style="display:none;" class="summary-output">
+                <h2 id="summary-title">Doküman Özeti</h2>
+                <div id="summary-text-content" style="color:var(--text-main); font-size:0.95rem;"></div>
+            </div>
+        </div>
+
+        <!-- SEKME 5: WEB & DOSYA YÜKLEYİCİ -->
+        <div id="tab-ingester" class="tab-content">
+            <div class="sidebar-card" style="margin-bottom:1.5rem;">
+                <h3><i class="fa-solid fa-globe"></i> Web Makalesi / Link Kazıyıcı</h3>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <input type="url" id="article-url-input" style="flex:1; background:#0a0d14; border:1px solid var(--border-color); padding:10px; border-radius:6px; color:#fff;" placeholder="https://eprint.iacr.org/... veya Wikipedia makale linki yapıştırın">
+                    <button class="btn-send" onclick="ingestURL()">
+                        <i class="fa-solid fa-bolt"></i> Kazı ve Vektörleştir
+                    </button>
+                </div>
+            </div>
+
+            <div class="sidebar-card" style="margin-bottom:1.5rem;">
+                <h3><i class="fa-solid fa-file-arrow-up"></i> Yerel Dosya (PDF / TXT / MD) Yükleyici</h3>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <input type="file" id="file-upload-input" accept=".pdf,.txt,.md" style="flex:1; background:#0a0d14; border:1px solid var(--border-color); padding:10px; border-radius:6px; color:#fff;">
+                    <button class="btn-send" onclick="uploadFile()">
+                        <i class="fa-solid fa-upload"></i> Dosyayı İndeksle
+                    </button>
+                </div>
+            </div>
+
+            <h2 style="font-size:1.1rem; margin-bottom:1rem; color:var(--text-muted);">İNDEKLENMİŞ VERİ TABANI DOKÜMANLARI</h2>
+            <div class="grid-cards" id="documents-grid">
+                <!-- Dynamically Populated -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let cachedPapers = [];
+        let cachedRFCs = [];
+
+        // Tab switching
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.currentTarget.classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+
+            if (tabId === 'library') loadLibrary();
+            if (tabId === 'summarizer') populateSummaryDropdown();
+            if (tabId === 'ingester') loadDocuments();
+        }
+
+        // Fetch Stats
+        async function updateStats() {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+                document.getElementById('stat-chunks').innerText = data.total_chunks;
+                document.getElementById('stat-rfcs').innerText = data.rfc_count;
+                document.getElementById('stat-articles').innerText = data.article_count;
+            } catch(e) {
+                console.error("Failed to load stats", e);
+            }
+        }
+
+        // Send RAG Query
+        async function sendQuery() {
+            const input = document.getElementById('user-input');
+            const question = input.value.trim();
+            if (!question) return;
+
+            const chatHistory = document.getElementById('chat-history');
+            
+            // Append User Message
+            chatHistory.innerHTML += `
+                <div class="message user">
+                    <div class="avatar"><i class="fa-solid fa-user"></i></div>
+                    <div class="bubble">${escapeHtml(question)}</div>
+                </div>
+            `;
+            input.value = '';
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            // Loading state
+            const loadingId = 'loading-' + Date.now();
+            chatHistory.innerHTML += `
+                <div class="message assistant" id="${loadingId}">
+                    <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+                    <div class="bubble">
+                        <span class="loader"></span> Vektör veritabanı taranıyor ve yerel model yanıt üretiyor...
+                    </div>
+                </div>
+            `;
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            const model = document.getElementById('model-select').value;
+            const topK = parseInt(document.getElementById('top-k-slider').value);
+            const filter = document.getElementById('filter-select').value;
+
+            try {
+                const res = await fetch('/api/query', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        question: question,
+                        model: model,
+                        top_k: topK,
+                        doc_type_filter: filter
+                    })
+                });
+                const data = await res.json();
+                
+                document.getElementById(loadingId).remove();
+
+                // Format Sources Chips
+                let sourcesHtml = '';
+                if (data.sources && data.sources.length > 0) {
+                    sourcesHtml = '<div class="source-tags"><strong>Referans Verilen Kaynaklar:</strong> ';
+                    data.sources.forEach(s => {
+                        const simPercent = Math.round(s.similarity * 100);
+                        const label = `[Kaynak ${s.id}] ${s.source}`;
+                        sourcesHtml += `<span class="source-chip" title="${escapeHtml(s.title)} (Benzerlik: %${simPercent})">${label} (%${simPercent})</span> `;
+                    });
+                    sourcesHtml += '</div>';
+                }
+
+                // Format Code blocks / lines in answer
+                let formattedAnswer = escapeHtml(data.answer)
+                    .replace(/\n\n/g, '<br><br>')
+                    .replace(/```(.*?)```/gs, '<pre>$1</pre>');
+
+                chatHistory.innerHTML += `
+                    <div class="message assistant">
+                        <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+                        <div class="bubble">
+                            <div>${formattedAnswer}</div>
+                            ${sourcesHtml}
+                        </div>
+                    </div>
+                `;
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            } catch(e) {
+                document.getElementById(loadingId).remove();
+                chatHistory.innerHTML += `
+                    <div class="message assistant">
+                        <div class="avatar"><i class="fa-solid fa-triangle-exclamation" style="color:#ef4444"></i></div>
+                        <div class="bubble" style="border-color:#ef4444">Hata oluştu: ${e.message}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function fillQuery(text) {
+            document.getElementById('user-input').value = text;
+            sendQuery();
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') sendQuery();
+        }
+
+        // Load Unified Library
+        async function loadLibrary() {
+            const [papersRes, rfcsRes] = await Promise.all([
+                fetch('/api/papers/featured'),
+                fetch('/api/rfcs/popular')
+            ]);
+            
+            const papersData = await papersRes.json();
+            const rfcsData = await rfcsRes.json();
+
+            cachedPapers = papersData.papers;
+            cachedRFCs = rfcsData.rfcs;
+
+            filterLibraryGrid();
+        }
+
+        function filterLibraryGrid() {
+            const filter = document.getElementById('library-filter').value;
+            const grid = document.getElementById('library-grid');
+            let cardsHtml = '';
+
+            if (filter === 'all' || filter === 'papers') {
+                cardsHtml += cachedPapers.map(p => `
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-badge" style="background:rgba(255, 183, 3, 0.15); color:var(--accent-gold);">${p.citations}</span>
+                            <span style="font-size:0.8rem; color:var(--text-muted);">${p.year}</span>
+                        </div>
+                        <div>
+                            <div class="card-title">${p.title}</div>
+                            <div style="font-size:0.8rem; color:var(--accent-cyan); margin-bottom:6px;">${p.authors}</div>
+                            <div class="card-desc">${p.description}</div>
+                        </div>
+                        <button class="btn-action" onclick="switchTab('chat'); fillQuery('Bana şu makaledeki bulguları açıkla: ${p.title}');">
+                            <i class="fa-solid fa-brain"></i> RAG Sohbetine Sor
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            if (filter === 'all' || filter === 'rfcs') {
+                cardsHtml += cachedRFCs.map(rfc => `
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-badge">RFC ${rfc.number}</span>
+                            <span style="font-size:0.8rem; color:var(--text-muted);">IETF Standart</span>
+                        </div>
+                        <div>
+                            <div class="card-title">${rfc.title}</div>
+                            <div class="card-desc">${rfc.description}</div>
+                        </div>
+                        <button class="btn-action" onclick="ingestPopularRFC(${rfc.number})">
+                            <i class="fa-solid fa-cloud-arrow-down"></i> İndir ve İndeksle
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            grid.innerHTML = cardsHtml;
+        }
+
+        async function ingestPopularRFC(num) {
+            alert(`RFC ${num} IETF sunucularından indiriliyor ve vektörleştiriliyor...`);
+            const res = await fetch('/api/ingest/rfc', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ rfc_number: num })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert(`RFC ${num} başarıyla veritabanına eklendi! (${data.chunks_added} parça eklendi)`);
+                updateStats();
+            } else {
+                alert(`Hata: ${data.detail || data.error}`);
+            }
+        }
+
+        // Populate Summarizer Dropdown
+        async function populateSummaryDropdown() {
+            const select = document.getElementById('summary-doc-select');
+            const res = await fetch('/api/documents');
+            const data = await res.json();
+
+            if (!data.documents || data.documents.length === 0) {
+                select.innerHTML = '<option value="">Veritabanında doküman bulunamadı</option>';
+                return;
+            }
+
+            select.innerHTML = data.documents.map(doc => `
+                <option value="${escapeHtml(doc.source)}">${escapeHtml(doc.title)} (${doc.source})</option>
+            `).join('');
+        }
+
+        // Generate Document Summary
+        async function generateSummary() {
+            const source = document.getElementById('summary-doc-select').value;
+            if (!source) return alert("Lütfen bir doküman seçin.");
+
+            const summaryType = document.getElementById('summary-type-select').value;
+            const model = document.getElementById('summary-model-select').value;
+
+            const outputBox = document.getElementById('summary-result-box');
+            const outputTitle = document.getElementById('summary-title');
+            const outputContent = document.getElementById('summary-text-content');
+
+            outputBox.style.display = 'block';
+            outputTitle.innerText = "Doküman Özeti Hazırlanıyor...";
+            outputContent.innerHTML = '<div style="padding:1rem; text-align:center;"><span class="loader"></span> Yerel Ollama modeli doküman parçalarını analiz edip Türkçe özet çıkarıyor...</div>';
+
+            try {
+                const res = await fetch('/api/summarize', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        source: source,
+                        model: model,
+                        summary_type: summaryType
+                    })
+                });
+                const data = await res.json();
+
+                if (data.summary) {
+                    outputTitle.innerText = `Doküman Özeti: ${data.title}`;
+                    let formatted = escapeHtml(data.summary)
+                        .replace(/\n\n/g, '<br><br>')
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/```(.*?)```/gs, '<pre>$1</pre>');
+                    outputContent.innerHTML = formatted;
+                } else {
+                    outputContent.innerHTML = `<span style="color:#ef4444">Özet oluşturulamadı: ${data.detail || data.error}</span>`;
+                }
+            } catch(e) {
+                outputContent.innerHTML = `<span style="color:#ef4444">Sunucu hatası: ${e.message}</span>`;
+            }
+        }
+
+        // Ingest URL
+        async function ingestURL() {
+            const url = document.getElementById('article-url-input').value.trim();
+            if (!url) return alert("Lütfen geçerli bir URL girin");
+            
+            alert("Web sayfası kazınıyor ve işleniyor...");
+            const res = await fetch('/api/ingest/url', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ url: url })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert(`URL başarıyla vektörleştirildi! (${data.chunks_added} parça eklendi)`);
+                document.getElementById('article-url-input').value = '';
+                updateStats();
+            } else {
+                alert(`Hata: ${data.detail || data.error}`);
+            }
+        }
+
+        // Upload File
+        async function uploadFile() {
+            const fileInput = document.getElementById('file-upload-input');
+            if (!fileInput.files.length) return alert("Lütfen bir dosya seçin");
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            alert("Dosya yükleniyor ve indeksleniyor...");
+            const res = await fetch('/api/ingest/file', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert(`Dosya başarıyla indekslendi! (${data.chunks_added} parça eklendi)`);
+                loadDocuments();
+                updateStats();
+            } else {
+                alert(`Hata: ${data.detail || data.error}`);
+            }
+        }
+
+        // Load Documents
+        async function loadDocuments() {
+            const grid = document.getElementById('documents-grid');
+            const res = await fetch('/api/documents');
+            const data = await res.json();
+
+            if (data.documents.length === 0) {
+                grid.innerHTML = '<p style="color:var(--text-muted)">Veritabanında henüz doküman bulunmuyor.</p>';
+                return;
+            }
+
+            grid.innerHTML = data.documents.map(doc => `
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-badge">${doc.type}</span>
+                        <span style="font-size:0.8rem; color:var(--text-muted);">${doc.chunk_count} parça</span>
+                    </div>
+                    <div>
+                        <div class="card-title">${doc.title}</div>
+                        <div class="card-desc" style="font-family:'Fira Code'; font-size:0.75rem;">Kaynak: ${doc.source}</div>
+                    </div>
+                    <button class="btn-action btn-delete" onclick="deleteDoc('${escapeHtml(doc.source)}')">
+                        <i class="fa-solid fa-trash"></i> Dokümanı Sil
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        async function deleteDoc(source) {
+            if (!confirm(`${source} dokümanını veritabanından silmek istediğinize emin misiniz?`)) return;
+            const res = await fetch(`/api/documents?source=${encodeURIComponent(source)}`, { method: 'DELETE' });
+            const data = await res.json();
+            alert(data.message);
+            loadDocuments();
+            updateStats();
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        async function loadAvailableModels() {
+            try {
+                const res = await fetch('/api/models');
+                const data = await res.json();
+                const models = data.models || [];
+                const modelNames = models.map(m => typeof m === 'string' ? m : m.name).filter(n => n && !n.toLowerCase().includes('embed'));
+                
+                if (modelNames.length > 0) {
+                    const modelSelect = document.getElementById('model-select');
+                    const summarySelect = document.getElementById('summary-model-select');
+                    
+                    const optionsHtml = modelNames.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
+                    if (modelSelect) modelSelect.innerHTML = optionsHtml;
+                    if (summarySelect) summarySelect.innerHTML = optionsHtml;
+                }
+            } catch(e) {
+                console.error("Failed to load local models", e);
+            }
+        }
+
+        // Init
+        updateStats();
+        loadAvailableModels();
+    </script>
+</body>
+</html>
