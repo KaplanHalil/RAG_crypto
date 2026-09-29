@@ -93,6 +93,11 @@ def cmd_serve(args: argparse.Namespace) -> None:
     uvicorn.run("app:app", host=args.host, port=args.port, reload=False)
 
 
+def cmd_chat(_: argparse.Namespace) -> None:
+    from .tui import run
+    run()
+
+
 def cmd_eval(args: argparse.Namespace) -> None:
     from .evaluation import main as eval_main
     sys.argv = ["evaluation", "--benchmark", args.benchmark, "--out",
@@ -149,6 +154,9 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--host", default="0.0.0.0")
     sp.add_argument("--port", type=int, default=8000)
     sp.set_defaults(func=cmd_serve)
+
+    sp = sub.add_parser("chat", help="launch the interactive terminal UI")
+    sp.set_defaults(func=cmd_chat)
 
     sp = sub.add_parser("eval", help="run the evaluation harness")
     sp.add_argument("--benchmark", default="eval/qa_benchmark.json")

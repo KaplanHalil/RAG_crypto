@@ -30,6 +30,23 @@ Generation System for Cryptography and Cryptanalysis"* (see `paper/`).
 - **Three interfaces** — Python library, CLI, and a FastAPI web server with a
   single-page English UI.
 
+## Terminal UI (TUI)
+
+A full-screen, chat-style terminal interface built with Textual:
+
+```bash
+python -m crypto_rag.cli chat
+```
+
+- Ask questions and get markdown-rendered answers with inline `[SOURCE n]` citations
+  and a source list (title, file, similarity) under each answer
+- Switch the local Ollama model on the fly (top bar), set Top-K, and filter by
+  document type
+- Slash commands: `/help`, `/stats`, `/clear`, `/ingest-rfc N`,
+  `/ingest-url URL`, `/ingest-file PATH`, `/quit`
+- Shortcuts: `ctrl+q` quit, `ctrl+l` clear the chat; generation runs on a
+  worker thread so the UI stays responsive
+
 ## Architecture
 
 ```
@@ -94,6 +111,7 @@ python -m crypto_rag.cli serve
 ## CLI reference
 
 ```
+python -m crypto_rag.cli chat
 python -m crypto_rag.cli stats
 python -m crypto_rag.cli query "question" [--top-k 5] [--model qwen3.5:9b] [--type RFC Document]
 python -m crypto_rag.cli ingest-rfc 9180

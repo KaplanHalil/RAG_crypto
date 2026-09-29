@@ -20,3 +20,6 @@ openai>=1.30
 # --- Development / evaluation ---
 pytest>=8.0
 matplotlib>=3.8
+
+# --- Terminal UI ---
+textual>=8.0
