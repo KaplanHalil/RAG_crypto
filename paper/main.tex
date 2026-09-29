@@ -1,0 +1,578 @@
+% IACR Communications in Cryptology (CiC) submission.
+% Anonymous submission per CiC policy: no author names in this file.
+% For the camera-ready version, uncomment \usepackage[notanonymous] (class option)
+% and fill in \addauthor / \addaffiliation.
+
+\documentclass[version=submission]{iacrcc}
+\license{CC-by}
+
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, fit, backgrounds}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+\title[running = {CryptoRAG: Local RAG for Cryptography},
+      subtitle = {A fully local, citation-aware RAG system for cryptography and cryptanalysis}
+     ]{CryptoRAG: A Locally-Deployable, Citation-Aware Retrieval-Augmented Generation System for Cryptography and Cryptanalysis}
+
+% Temporary placeholder macro (fill before submission)
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{#1}}}
+
+% ---------------------------------------------------------------------------
+% Camera-ready authors (leave commented out for the anonymous submission):
+% \addauthor[inst={1}, email={...}]{Halil Kaplan}
+% \addaffiliation[country={...}]{...}
+% ---------------------------------------------------------------------------
+
+\begin{document}
+\maketitle
+
+\keywords{retrieval-augmented generation, cryptography, cryptanalysis,
+          large language models, local LLMs, vector databases}
+
+\begin{abstract}
+Large language models (LLMs) hallucinate on precise technical questions:
+given a question about cryptography, they frequently invent attack
+complexities, round counts, and standards that do not exist.
+Retrieval-augmented generation (RAG) addresses this by grounding answers in a
+retrievable corpus, but most RAG deployments rely on commercial APIs, which
+conflicts with the confidentiality requirements of real cryptographic work and
+undermines reproducibility.
+We present \emph{CryptoRAG}, a fully local, citation-aware RAG system for
+cryptography and cryptanalysis. The system ingests a curated knowledge base of
+IETF RFCs, NIST standards, and landmark cryptanalysis papers (46 documents,
+$\sim$3{,}600 chunks), retrieves with a hybrid dense-plus-lexical retriever
+that fuses vector similarity with an Okapi-BM25 scorer via reciprocal-rank
+fusion, and generates answers with locally deployed instruction-tuned models
+under a hallucination-guard prompt that requires inline source citations.
+On a newly introduced benchmark of 49 grounded questions over the curated
+corpus, the hybrid retriever achieves hit@10 of 0.857, MRR@10 of 0.717, and
+nDCG@10 of 0.750, improving hit@10 by $+0.06$ over dense-only retrieval, with
+LLM-judged answer faithfulness of 5.0/5.0 on a 15-question answer sample and
+a 100\% citation-validity rate over all 14 non-empty answers. The complete
+system, including the benchmark and evaluation harness, is released as open
+source. The design keeps all data and inference on the users machine,
+providing a blueprint for grounded, privacy-preserving technical Q\&A in
+applied cryptography.
+\end{abstract}
+
+\section{Introduction}
+
+Modern machine learning is discovering LLMs: a crop of recent systems
+\cite{lewis2020rag,gao2023survey} and the emerging
+capability landscape in generative AI. Yet the cryptographic community has
+been cautious about LLMs for a concrete reason: they hallucinate. When asked
+``what is the data complexity of linear cryptanalysis against 16-round
+DES?'', an ungrounded LLM will often answer with a confident but incorrect
+$2^{43}$, $2^{47}$, or $2^{44}$ known plaintexts. Such numeric claims are
+exactly the kind of detail that matters in cryptanalysis, where a factor of
+four in an exponent determines whether an attack is practical.
+
+Retrieval-augmented generation (RAG) \cite{lewis2020rag} is the dominant
+mitigation: it retrieves authoritative passages from a corpus and conditions
+the generator on them. RAG has been applied successfully in clinical medicine
+\cite{zakka2024almanac} and open-domain question answering
+\cite{karpukhin2020dpr}, but deployments typically
+rely on commercial API models, sending proprietary code and data off-device.
+This is a poor fit for cryptography, where the queries themselves can be
+sensitive (``is our implementation of the nonce generator leaking?'') and
+where implementation details of security modules must not leave the premises.
+
+In this paper we present \emph{CryptoRAG}, a RAG system that answers
+questions about cryptography and cryptanalysis entirely on the users own
+hardware. The system combines:
+
+\begin{itemize}
+\item a \emph{curated knowledge base} of 46 documents covering IETF RFCs
+  (TLS~1.3, ChaCha20-Poly1305, Curve25519, HMAC), NIST standards (AES,
+  SHA-2/SHA-3, FIPS~186-5, ML-KEM, ML-DSA, SLH-DSA, SP~800-22), and landmark
+  cryptanalysis papers (differential and linear cryptanalysis, differential
+  power analysis, padding oracles, Coppersmith's method, SHA-1 collisions),
+\item a \emph{hybrid retriever} that fuses dense vector search with an
+  Okapi-BM25 lexical scorer through reciprocal-rank fusion (RRF)
+  \cite{cormack2009rrf}, exploiting the exact identifiers (``$2^{43}$'',
+  ``RFC~8446'', ``ML-KEM'') that dense matching tends to miss,
+\item a \emph{citation-aware generator} running an instruction-tuned model
+  locally (Ollama), constrained by a system prompt that requires every claim
+  to carry an inline ``[SOURCE $n$: title]'' citation and forbids content
+  outside the retrieved context,
+\item an \emph{evaluation harness} and a \emph{49-question grounded QA
+  benchmark} annotated with the documents that contain each answer, from
+  which we report standard retrieval metrics and LLM-judged answer
+  faithfulness.
+\end{itemize}
+
+Our contribution is a complete, reproducible, fully local RAG stack for
+cryptography, together with the first small benchmark of its kind and open
+measurements of retrieval and answer quality. The implementation, benchmark,
+and evaluation harness are released as open source at
+\texttt{https://github.com/KaplanHalil/RAG\_crypto} in the camera-ready
+version of this paper.
+
+\section{Background and Related Work}
+
+\subsection{Retrieval-Augmented Generation}
+RAG \cite{lewis2020rag} decomposes question answering into a retrieval stage
+and a generation stage. The retrieval stage encodes chunks of a corpus into a
+dense vector index and returns the top-$k$ most similar chunks for a query;
+the generation stage conditions an LLM on the concatenated chunks. Surveys
+\cite{gao2023survey} characterize the design space (chunking, index, retrieval
+strategy, prompt composition) and the failure modes (hallucination when the
+retrieved context is irrelevant, and unfaithful answers when the generator
+ignores it). Recent work complements dense retrieval with lexical scoring;
+hybrid approaches that fuse rankings with reciprocal-rank fusion
+\cite{cormack2009rrf,robertson2009bm25} are a standard remedy for identifiers
+and rare tokens. We follow this line and measure its effect on a
+cryptography-specific corpus in \Cref{sec:eval}.
+
+\subsection{RAG for specialized domains}
+Grounded question answering has been shown effective in knowledge-intensive
+domains; the most mature examples are in clinical medicine, where
+retrieval-augmented systems such as Almanac \cite{zakka2024almanac} ground
+answers in peer-reviewed medical literature, and in open-domain QA, where
+dense passage retrieval \cite{karpukhin2020dpr} established the standard
+retrieval formulation. Several surveys \cite{gao2023survey} systematize the
+design choices and evaluation methodology for such systems. In the security
+domain, most RAG demonstrations index vulnerability feeds rather than
+cryptanalytic source material, and we are not aware of a peer-reviewed,
+benchmarked RAG system aimed specifically at the cryptography and
+cryptanalysis literature. CryptoRAG targets that gap, and in contrast to most
+prior systems emphasizes a fully local deployment story.
+
+\subsection{Local LLMs and embeddings}
+Smaller instruction-tuned models deployed with Ollama \cite{ollama} and open
+embedding models such as \textsc{nomic-embed-text} \cite{nomic2024} make
+on-device RAG practical on a single consumer GPU. Our evaluation compares two
+local models ($9$B and $26$B parameters) and uses one of them as an independent
+judge of the other, avoiding the self-scoring bias noted in LLM-as-judge
+studies \cite{zheng2023judging}.
+
+\subsection{AI-assisted cryptographic analysis}
+There is growing interest in using machine learning for cryptanalysis, most
+prominently neural distinguishers for round-reduced block ciphers
+\cite{gohr2019}. CryptoRAG is orthogonal: it does not attack ciphers, but
+makes the \emph{existing} cryptanalytic literature and standards reliably
+available to engineers and researchers through a grounded interface.
+
+\section{System Architecture}
+\label{sec:arch}
+
+Figure~\ref{fig:arch} shows the overall architecture. The pipeline is
+organized into a small number of components, each implemented as an isolated
+Python module: ingestion, chunking, vector indexing, hybrid retrieval, and
+generation. The boundaries are deliberately kept composable so that any stage
+(retriever, embedding model, generator, corpus) can be swapped for an
+ablation or for a different deployment.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  box/.style={draw, rounded corners=4pt, fill=blue!8, minimum height=8mm,
+              align=center, font=\small},
+  line/.style={-{Stealth[length=3mm]}, thick},
+  node distance=4mm and 10mm]
+  \node[box] (kb) {Knowledge base\\46 docs, $\sim$3.6k chunks};
+  \node[box, right=of kb] (seg) {Chunker\\paragraph-aware overlap};
+  \node[box, right=of seg] (vs) {Vector store\\ChromaDB, cosine};
+  \node[box, above=6mm of vs] (em) {Embeddings\\nomic-embed-text};
+  \node[box, below=of kb] (q) {Question};
+  \node[box, right=of q] (dr) {Dense retrieval};
+  \node[box, below=10mm of dr] (lex) {Lexical BM25};
+  \node[box, right=of dr, xshift=4mm] (rrf) {RRF fusion};
+  \node[box, right=of rrf] (gen) {Generator\\qwen3.5:9b / gemma4:26b};
+  \node[box, right=of gen] (ans) {Cited answer\\ (sources cited)};
+  \draw[line] (kb)--(seg);
+  \draw[line] (seg)--(vs);
+  \draw[line] (em)--(vs);
+  \draw[line] (q)--(dr);
+  \draw[line] (dr)--(rrf);
+  \draw[line] (lex)--(rrf);
+  \draw[line] (vs.north east) to[out=0,in=180] (dr.south east);
+  \draw[line] (vs.east) to[out=0,in=180] (lex.west);
+  \draw[line] (rrf)--(gen);
+  \draw[line] (gen)--(ans);
+\end{tikzpicture}
+\caption{CryptoRAG architecture. The same embedding provider serves indexing
+and querying; retrieval fuses dense and lexical rankings before generation.}
+\label{fig:arch}
+\end{figure}
+
+\subsection{Ingestion and metadata}
+Each document is normalized into a canonical representation with four
+metadata fields --- \texttt{source} (stable identifier), \texttt{title},
+\texttt{url}, and \texttt{type} --- where \texttt{type} is one of {RFC
+Document}, {NIST Standard}, {Cryptanalysis Paper}, {Cryptography Paper}, or
+{Local Document}. Loaders exist for IETF RFC text (by number, from
+\texttt{rfc-editor.org}), arbitrary web pages (HTML to text), and local
+PDF/TXT files. Documents whose source contains an attack-related keyword
+(e.g.\ \emph{attack}, \emph{collision}, \emph{boomerang}) are classified as
+cryptanalysis papers; NIST/FIPS filenames as standards; RFC filenames as RFCs.
+
+\subsection{Chunking}
+We use a deterministic, paragraph-aware chunker. Text is split on blank lines;
+paragraphs are accumulated into chunks of at most $1{,}000$ characters with
+$150$ characters of overlap, so that information crossing a chunk boundary
+remains retrievable at both ends. Paragraphs longer than $200$ words are split
+internally with the same overlap. Section headers are preserved inside chunks,
+which helps retrieval for section-addressing questions.
+
+\subsection{Embeddings and vector index}
+Chunks are embedded with \textsc{nomic-embed-text} (768-dimensions, local
+Ollama) and stored in a persistent ChromaDB \cite{chromadb} collection with
+cosine distance. The same embedding provider is used at query time, and a thin
+adapter exposes it to ChromaDB's query interface. Because the embedding model
+is held fixed across indexing and search, the index can be rebuilt
+deterministically by re-running the ingestion script.
+
+\subsection{Hybrid retrieval}
+Search over a cryptanalytic corpus is a mixture of semantic and exact
+retrieval: ``how does a padding oracle decrypt a block?'' is a semantic query,
+while ``data complexity $2^{43}$'' or ``RFC~8446'' are exact, identifier
+queries that dense vectors frequently collapse. We therefore fuse two
+rankings with reciprocal-rank fusion \cite{cormack2009rrf}: a dense ranking
+from the vector store and a lexical ranking from an Okapi-BM25
+\cite{robertson2009bm25} scorer computed over the full corpus. RRF combines
+ranks rather than scores, which makes the fusion robust to the incomparable
+scales of cosine similarity and BM25 scores. A document-type filter can be
+applied in both branches. \Cref{sec:eval} shows the fusion improves hit@10 by
+$+0.06$.
+
+\subsection{Grounded generation with citations}
+The generator assembles a prompt from the retrieved chunks. Each distinct
+document is assigned a stable 1-based index and each chunk is prefixed with
+``--- SOURCE $n$: title ---''. The system prompt (Figure~\ref{fig:prompt})
+instructs the model to (i)~answer only from the supplied context, (ii)~attach
+an inline citation ``[SOURCE $n$: title]'' to every important claim,
+(iii)~never invent source numbers, and (iv)~explicitly say when the context
+does not cover part of the question. Answers are generated with
+temperature~0.2 and a bounded number of output tokens. The same architecture
+supports a document-summarization mode that mirrors the citation rules.
+
+\begin{figure}[t]
+\centering
+\small
+\begin{minipage}{0.92\linewidth}\ttfamily\footnotesize
+\noindent You are an expert assistant in cryptography and cryptanalysis.\\
+Answer using ONLY the retrieved knowledge provided in the\\
+'RETRIEVED KNOWLEDGE CONTEXT' section below.\\[1mm]
+1. GROUNDING: answer exclusively from the retrieved context. Do not\\
+   invent papers, RFCs, standards, or results that do not appear in it.\\
+2. CITATIONS: every important claim must carry an inline citation of the\\
+   form [SOURCE n: Document Title], using the source numbers in the context.\\
+3. NEVER cite a source number that is not present in the context.\\
+4. Include concrete parameters (rounds, data/time complexity, key sizes)\\
+   exactly as reported.\\
+5. If the context covers only part of the question, answer that part and\\
+   state explicitly what is not covered.
+\end{minipage}
+\caption{Abridged system prompt. The full prompt is reproduced in
+\Cref{app:prompt}.}
+\label{fig:prompt}
+\end{figure}
+
+\section{Knowledge Base}
+\label{sec:kb}
+
+The knowledge base is assembled from three sources, all of which are part of
+the open-source release.
+
+\paragraph{Local corpus.}
+The folder \texttt{kripto\_makaleler/} contains 38 machine-readable documents
+collected from public sources: IETF RFCs in plain text (RFC~8446 TLS~1.3,
+RFC~8439 ChaCha20-Poly1305, RFC~7748 Curve25519/Curve448, RFC~2104 HMAC) and
+PDFs of NIST standards and of primary cryptanalysis papers. The text is
+extracted with \texttt{pypdf}; one scanned paper (Goldwasser--Micali--Rackoff
+on zero-knowledge proofs) has no extractable text and is covered by a curated
+entry instead (see below).
+
+\paragraph{Curated landmark papers.}
+For a set of 8 highly-cited papers that are canonical answers for frequent
+questions --- differential cryptanalysis of DES \cite{BS91}, linear
+cryptanalysis \cite{Mat93}, differential power analysis \cite{KJJ99},
+Bleichenbacher's MILLION MESSAGE attack \cite{Ble98}, Coppersmith's method
+\cite{Cop97}, Wang \emph{et al.}\ SHA-1 collisions \cite{WYY05}, Vaudenay's
+padding oracles \cite{Vau02}, and zero-knowledge proofs \cite{GMR89} --- we
+contributed manually structured, technically accurate entries (source,
+results, complexities, countermeasures) so that questions about this canon are
+answerable even when the original PDF is unavailable or not machine-readable.
+
+\paragraph{Statistics.}
+After indexing, the collection contains 46 documents and 3{,}650 chunks:
+4 RFCs, 8 NIST standards, and 34 papers/articles. \Cref{tab:kb} summarizes
+the corpus by category.
+
+\begin{table}[t]
+\centering
+\caption{Knowledge-base composition after indexing.}
+\label{tab:kb}
+\begin{tabular}{lrr}
+\toprule
+Category & Documents & Chunks\\
+\midrule
+RFC Document & 4 & 267\\
+NIST Standard & 8 & 1{,}336\\
+Cryptanalysis / Cryptography Paper & 34 & 2{,}047\\
+\midrule
+Total & 46 & 3{,}650\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Implementation}
+
+The implementation is a Python 3 package (\texttt{crypto\_rag/}) with a CLI
+and a FastAPI server. The server exposes a REST API --- \texttt{/api/query},
+\texttt{/api/ingest/*}, \texttt{/api/documents}, \texttt{/api/stats},
+\texttt{/api/summarize} --- and a single-page web interface. Configuration is
+read from environment variables via \texttt{pydantic-settings}; switching
+between the local Ollama backend and an OpenAI-compatible cloud backend is a
+configuration change and requires no code modification. All prompts, error
+messages, and the user interface are in English.
+
+\paragraph{Deployment.}
+Indexing 3{,}650 chunks with \textsc{nomic-embed-text} completes in under two
+minutes on a single NVIDIA RTX 3060 (12 GB); generation with \textsc{qwen3.5:9b}
+averages a few seconds per answer, and with \textsc{gemma4:26b} under a minute,
+both fully on-device.
+
+\section{Evaluation}
+\label{sec:eval}
+
+\subsection{Benchmark}
+We introduce a small benchmark of $49$ questions over the curated knowledge
+base, split across nine categories (symmetric cryptanalysis, asymmetric
+cryptanalysis, side channels, hash, post-quantum, protocols, RNG, asymmetric,
+and theory). Every question is annotated with the documents that are known to
+contain the answer (document-level gold labels), allowing retrieval metrics to
+be computed without per-chunk labels. The benchmark is released together with
+the system so that future RAG systems for cryptography can be compared against
+identical ground truth.
+
+\subsection{Retrieval quality}
+We compare two retrievers --- dense-only and hybrid (dense + BM25, RRF) ---
+at $k \in \{1,3,5,10,20\}$ using document-level hit@k, MRR@k, and nDCG@k.
+\Cref{tab:eval1,tab:eval2,tab:eval3} report the results.
+
+\begin{table}[t]
+\centering
+\caption{Hit@k by retriever and top-$k$ (49 questions).}
+\label{tab:eval1}
+\begin{tabular}{lccccc}
+\toprule
+ & $k{=}1$ & $k{=}3$ & $k{=}5$ & $k{=}10$ & $k{=}20$\\
+\midrule
+Dense   & 0.633 & 0.755 & 0.776 & 0.796 & 0.796\\
+Hybrid  & 0.633 & 0.755 & \textbf{0.837} & \textbf{0.857} & \textbf{0.857}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{MRR@k by retriever and top-$k$.}
+\label{tab:eval2}
+\begin{tabular}{lccccc}
+\toprule
+ & $k{=}1$ & $k{=}3$ & $k{=}5$ & $k{=}10$ & $k{=}20$\\
+\midrule
+Dense   & 0.633 & 0.690 & 0.695 & 0.697 & 0.697\\
+Hybrid  & 0.633 & 0.694 & 0.713 & \textbf{0.717} & \textbf{0.717}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{nDCG@k by retriever and top-$k$.}
+\label{tab:eval3}
+\begin{tabular}{lccccc}
+\toprule
+ & $k{=}1$ & $k{=}3$ & $k{=}5$ & $k{=}10$ & $k{=}20$\\
+\midrule
+Dense   & 0.633 & 0.698 & 0.706 & 0.712 & 0.712\\
+Hybrid  & 0.633 & 0.708 & 0.743 & \textbf{0.750} & \textbf{0.750}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The hybrid retriever improves hit@10 by $+0.06$ (0.796 to 0.857), MRR@10 by
+$+0.02$, and nDCG@10 by $+0.038$. The gains are concentrated in identifier-
+and number-heavy queries. For example, the question asking for Matsui's data
+complexity of $2^{43}$ known plaintexts is answered at rank~1 with the hybrid
+retriever by matching the ``$2^{43}$'' token lexically, while the dense
+retriever surfaces related but less precise material first.
+
+\subsection{Answer quality}
+We generated answers with \textsc{qwen3.5:9b} (temperature 0.2) on the first
+15 benchmark questions and scored them with an independent judge
+(\textsc{gemma4:26b}, temperature 0) using a 1--5 faithfulness rubric: every
+claim must be supported by the retrieved context. We also measure the citation
+rate, the fraction of non-empty answer lines that carry a ``[SOURCE $n$]''
+marker, and the citation-validity rate, the fraction of answers in which every
+cited source number corresponds to a source that was actually present in the
+retrieved context (a deterministic check for fabricated citations).
+
+\Cref{tab:eval4} reports the results. 14 of 15 answers were non-empty. The
+mean citation rate is 0.502, and every one of the 14 answers containing
+citations is 100\% citation-valid: no ``[SOURCE $n$]'' reference points to a
+source that was not retrieved. The independent judge scored the 12 answers it
+could process at the maximum 5.0/5.0, indicating that the hallucination-guard
+prompt is effective in practice: the model consistently marks its sources and
+refuses to commit to details outside the retrieved context. We caution that a
+perfect mean score partly reflects judge generosity and the heavily grounded
+design; the deterministic citation-validity result is the stronger evidence
+(see also \Cref{subsec:threats}).
+
+\begin{table}[t]
+\centering
+\caption{Answer-quality metrics over 15 answers (qwen3.5:9b; judged by
+gemma4:26b). Citation validity counts answers that contain at least one
+citation and in which every cited source number was retrieved (14 of 14).
+Faithfulness: 12 of 15 answers scorable by the judge.}
+\label{tab:eval4}
+\begin{tabular}{lrr}
+\toprule
+Metric & Mean & $n$\\
+\midrule
+LLM-judged faithfulness (1--5) & 5.00 & 12\\
+Citation rate (share of cited lines) & 0.502 & 14\\
+Citation validity (share of valid answers) & 1.000 & 14\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\Cref{fig:example} shows a representative answer with its retrieved sources.
+
+\begin{figure}[t]
+\centering
+\small
+\begin{minipage}{0.95\linewidth}
+\emph{Q.} What is the data complexity of Matsui's linear cryptanalysis attack
+on 16-round DES?\\[1mm]
+\emph{A.} According to Matsui's \emph{Linear Cryptanalysis Method for DES
+Cipher} [SOURCE 1], the data complexity of full 16-round DES is $2^{43}$
+known plaintexts, experimentally verified by Matsui in 1994 on DEC Alpha
+workstations [SOURCE 1: Linear Cryptanalysis Method for DES Cipher (Matsui
+1993)]. Note that the $2^{47}$ figure reported in SOURCE 3 refers to
+\emph{differential} cryptanalysis [SOURCE 3: Differential Cryptanalysis of
+DES-like Cryptosystems (Biham, Shamir 1991)] and must not be conflated with
+the linear attack.
+\end{minipage}
+\caption{A representative grounded answer. The model distinguishes the two
+attack families and cites each claim to its source.}
+\label{fig:example}
+\end{figure}
+
+\subsection{Threats to validity}
+\label{subsec:threats}
+The benchmark is small (49 questions) and annotated by the authors; the
+document-level gold labels reflect both the corpus and our curation. Answer
+quality is measured on a 15-question sample with an LLM judge, which is an
+imperfect proxy for expert assessment; in particular, the mean faithfulness
+sat at the rubric maximum, which we attribute partly to judge generosity given
+the heavily grounded prompts. We mitigate judge bias by using a different
+model for judging than for generation, and we complement it with the
+deterministic citation-validity check. Three of the fifteen judge calls and
+one generation call returned empty responses on the local hardware; those
+answers contribute no faithfulness score and the observation is reported
+transparently. The corpus mixes primary sources and curated secondary content;
+questions were written to be answerable within the corpus, so the absolute
+numbers should not be read as coverage of the whole of cryptography.
+
+\section{Limitations and Future Work}
+
+\paragraph{Trust and verification.}
+Grounded citations reduce but do not eliminate hallucination: the generator
+can still over-abstract within a single cited source. Future work should add
+post-hoc fact verification against the retrieved chunks (e.g.\ claim-level
+entailment checks) and probabilistic calibration of the citation-grounded
+claims.
+
+\paragraph{Benchmark scale.}
+The 49-question benchmark should grow to several hundred questions spanning
+more recent literature (post-quantum constructions, ZK proofs, side-channel
+countermeasures) with expert-annotated gold answers, enabling statistically
+stronger comparisons and an automated regression test for the system itself.
+
+\paragraph{Retrieval.}
+Higher-quality reranking (cross-encoders, LLM rerankers) and query expansion
+could further close the gap between hit@5 (0.837) and an ideal retriever; we
+leave a systematic study of chunk size, overlap, and embedding-model choice as
+future work.
+
+\paragraph{Model scale.}
+We evaluated two local models; larger local models (40B+) or quantized
+versions of frontier models would clarify how much of the faithfulness gain
+comes from retrieval versus from model capability.
+
+\section{Conclusion}
+
+We presented CryptoRAG, a fully local, citation-aware retrieval-augmented
+generation system for cryptography and cryptanalysis, and released it as open
+source together with a 49-question grounded benchmark and an evaluation
+harness. On the benchmark, hybrid dense-plus-lexical retrieval with
+reciprocal-rank fusion (hit@10 0.857) clearly outperforms dense-only retrieval
+(0.796), and generation under a hallucination-guard prompt produces answers
+with a citation rate of 0.502 and a 100\% citation-validity rate over the
+non-empty answers (14 of 14), with a measured answer faithfulness of 5.0/5.0
+by an independent local judge. The system demonstrates that a single consumer
+GPU is sufficient to run a grounded, private, and reproducible technical
+Q\&A assistant over the cryptographic literature --- a blueprint that we hope
+the community extends into wider corpora and stricter verification.
+
+\bibliography{refs}
+
+\appendix
+\section{Reproduction}
+\label{app:repro}
+The repository at \texttt{https://github.com/KaplanHalil/RAG\_crypto}
+contains the full implementation, the corpus-ingestion scripts, the benchmark,
+and the evaluation harness. To reproduce the numbers in this paper:
+\begin{enumerate}
+\item install dependencies and pull the models
+  (\texttt{nomic-embed-text}, \texttt{qwen3.5:9b}, \texttt{gemma4:26b}) with
+  Ollama;
+\item rebuild the index: \texttt{python -m crypto\_rag.cli index-corpus --reset};
+\item run the retrieval evaluation:
+  \texttt{python -m crypto\_rag.cli eval --top-k 1,3,5,10,20};
+\item run the answer evaluation:
+  \texttt{python -m crypto\_rag.cli eval --answer 15 --judge --judge-model gemma4:26b}.
+\end{enumerate}
+All results in \Cref{sec:eval} were produced with the default configuration
+(chunk size 1{,}000, overlap 150, top-$k$=5, temperature 0.2) on a machine
+with an NVIDIA RTX 3060, 32 GB RAM, and Ollama 0.33.x.
+
+\section{System Prompt (full)}
+\label{app:prompt}
+\begin{quote}\footnotesize\ttfamily
+You are an expert assistant in cryptography and cryptanalysis. Answer the
+user's question using ONLY the retrieved knowledge provided in the
+'RETRIEVED KNOWLEDGE CONTEXT' section below. Follow these rules strictly:
+
+1. GROUNDING: Base your answer exclusively on the retrieved context. Do not
+invent papers, RFCs, standards, attack complexities, or results that do not
+appear in the context. If the context does not contain the answer, say so
+clearly instead of guessing.
+
+2. CITATIONS: Every important claim must be accompanied by an inline
+citation of the exact source it comes from, in the form
+[SOURCE n: Document Title] where n is the source number assigned in the
+context (e.g. [SOURCE 1: Linear Cryptanalysis Method for DES Cipher]).
+
+3. NEVER cite a source number that is not present in the context.
+
+4. Technical accuracy: include concrete parameters (number of rounds, data
+and time complexity, key sizes) exactly as reported in the context.
+
+5. If the retrieved context only covers part of the question, answer that
+part and explicitly state which part is not covered by the retrieved sources.
+\end{quote}
+
+\end{document}

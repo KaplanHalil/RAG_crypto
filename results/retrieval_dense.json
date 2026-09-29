@@ -1,0 +1,689 @@
+{
+  "metrics": {
+    "1": {
+      "hit@k": 0.6326530612244898,
+      "mrr@k": 0.6326530612244898,
+      "ndcg@k": 0.6326530612244898
+    },
+    "3": {
+      "hit@k": 0.7551020408163265,
+      "mrr@k": 0.6904761904761904,
+      "ndcg@k": 0.697704423464713
+    },
+    "5": {
+      "hit@k": 0.7755102040816326,
+      "mrr@k": 0.6945578231292516,
+      "ndcg@k": 0.7055993787143975
+    },
+    "10": {
+      "hit@k": 0.7959183673469388,
+      "mrr@k": 0.6974732750242953,
+      "ndcg@k": 0.7124020998028329
+    },
+    "20": {
+      "hit@k": 0.7959183673469388,
+      "mrr@k": 0.6974732750242953,
+      "ndcg@k": 0.7124020998028329
+    }
+  },
+  "results": [
+    {
+      "query": "How many chosen plaintexts are required to break 16-round DES using differential cryptanalysis?",
+      "gold_sources": [
+        "Biham & Shamir (1991) - Differential Cryptanalysis"
+      ],
+      "ranked_sources": [
+        "Biham & Shamir (1991) - Differential Cryptanalysis",
+        "Matsui (1993) - Linear Cryptanalysis",
+        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
+        "46_Diffie_Hellman_1976_New_Directions_in_Cryptography.pdf",
+        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
+        "27_Courtois_Pieprzyk_2002_Algebraic_Cryptanalysis_AES.pdf",
+        "Kocher et al. (1999) - Differential Power Analysis",
+        "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf"
+      ]
+    },
+    {
+      "query": "What is the data complexity of Matsui's linear cryptanalysis attack on 16-round DES?",
+      "gold_sources": [
+        "Matsui (1993) - Linear Cryptanalysis"
+      ],
+      "ranked_sources": [
+        "Matsui (1993) - Linear Cryptanalysis",
+        "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf",
+        "Biham & Shamir (1991) - Differential Cryptanalysis",
+        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
+        "56_Bernstein_2008_Salsa20_Family.pdf",
+        "13_Dinur_Shamir_2009_Cube_Attacks.pdf",
+        "28_Biryukov_Khovratovich_2009_Related_Key_AES.pdf",
+        "27_Courtois_Pieprzyk_2002_Algebraic_Cryptanalysis_AES.pdf",
+        "25_Stevens_et_al_2017_SHA1_Collision_SHAttered.pdf"
+      ]
+    },
+    {
+      "query": "State Matsui's Piling-up Lemma and how it combines single-round biases into a full trail bias.",
+      "gold_sources": [
+        "Matsui (1993) - Linear Cryptanalysis"
+      ],
+      "ranked_sources": [
+        "Matsui (1993) - Linear Cryptanalysis",
+        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
+        "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf",
+        "21_Bogdanov_et_al_2012_Zero_Correlation_Linear_Cryptanalysis.pdf",
+        "13_Dinur_Shamir_2009_Cube_Attacks.pdf",
+        "55_Bernstein_2008_ChaCha_Cipher.pdf",
+        "33_Kelsey_et_al_1998_PRNG_Cryptanalytic_Attacks.pdf",
+        "12_NIST_SP_800_22_Statistical_Tests_RNG.pdf",
+        "26_Wang_Yu_2005_MD5_Collisions.pdf",
+        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf",
+        "22_Wagner_1999_Boomerang_Attack.pdf"
+      ]
+    },
+    {
+      "query": "How does a differential power analysis attack recover key material from a hardware device?",
+      "gold_sources": [
+        "Kocher et al. (1999) - Differential Power Analysis"
+      ],
+      "ranked_sources": [
+        "Kocher et al. (1999) - Differential Power Analysis",
+        "22_Wagner_1999_Boomerang_Attack.pdf",
+        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
+        "37_Bernstein_2005_Cache_Timing_Attacks_AES.pdf",
+        "Biham & Shamir (1991) - Differential Cryptanalysis",
+        "13_Dinur_Shamir_2009_Cube_Attacks.pdf",
+        "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf",
+        "01_RFC8446_TLS_1_3_Specification.txt",
+        "02_NIST_FIPS_197_AES_Specification.pdf",
+        "18_Todo_Morii_2016_Bit_Based_Division_Property_SIMON.pdf"
+      ]
+    },
+    {
+      "query": "What countermeasures mitigate differential power analysis?",
+      "gold_sources": [
+        "Kocher et al. (1999) - Differential Power Analysis"
+      ],
+      "ranked_sources": [
+        "Kocher et al. (1999) - Differential Power Analysis",
+        "22_Wagner_1999_Boomerang_Attack.pdf",
+        "24_Biham_Biryukov_Shamir_1999_Impossible_Differential.pdf",
+        "Biham & Shamir (1991) - Differential Cryptanalysis",
+        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
+        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
+        "Matsui (1993) - Linear Cryptanalysis",
+        "27_Courtois_Pieprzyk_2002_Algebraic_Cryptanalysis_AES.pdf"
+      ]
+    },
+    {
+      "query": "Describe the interval reduction step of Bleichenbacher's padding oracle attack on RSA PKCS #1 v1.5.",
+      "gold_sources": [
+        "Bleichenbacher (1998) - PKCS#1 Padding Oracle"
+      ],
+      "ranked_sources": [
+        "Bleichenbacher (1998) - PKCS#1 Padding Oracle",
+        "Vaudenay (2002) - CBC Padding Oracle",
+        "16_Dinur_et_al_2015_Cube_Attacks_SIMON.pdf",
+        "25_Stevens_et_al_2017_SHA1_Collision_SHAttered.pdf",
+        "37_Bernstein_2005_Cache_Timing_Attacks_AES.pdf",
+        "01_RFC8446_TLS_1_3_Specification.txt",
+        "50_Bellare_Rogaway_1993_Random_Oracles.pdf",
+        "22_Wagner_1999_Boomerang_Attack.pdf",
+        "Coppersmith (1996) - Lattice RSA Attacks",
+        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf"
+      ]
+    },
+    {
+      "query": "Why did TLS 1.3 remove RSA encryption and what replaced it?",
+      "gold_sources": [
+        "Bleichenbacher (1998) - PKCS#1 Padding Oracle",
+        "01_RFC8446_TLS_1_3_Specification.txt"
+      ],
+      "ranked_sources": [
+        "01_RFC8446_TLS_1_3_Specification.txt"
+      ]
+    },
+    {
+      "query": "What does the univariate Coppersmith theorem state about small roots of a polynomial modulo N?",
+      "gold_sources": [
+        "Coppersmith (1996) - Lattice RSA Attacks"
+      ],
+      "ranked_sources": [
+        "06_NIST_FIPS_203_ML_KEM_Kyber_Standard.pdf",
+        "13_Dinur_Shamir_2009_Cube_Attacks.pdf",
+        "33_Kelsey_et_al_1998_PRNG_Cryptanalytic_Attacks.pdf",
+        "54_Bernstein_2006_Curve25519.pdf",
+        "24_Biham_Biryukov_Shamir_1999_Impossible_Differential.pdf",
+        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf",
+        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
+        "47_Rivest_Shamir_Adleman_1978_RSA_Cryptosystem.pdf"
+      ]
+    },
+    {
+      "query": "How can a partial exposure of the RSA private key bits lead to full key recovery?",
+      "gold_sources": [
+        "Coppersmith (1996) - Lattice RSA Attacks"
+      ],
+      "ranked_sources": [
+        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
+        "33_Kelsey_et_al_1998_PRNG_Cryptanalytic_Attacks.pdf",
+        "08_NIST_FIPS_205_SLH_DSA_SPHINCS_Standard.pdf",
+        "Bleichenbacher (1998) - PKCS#1 Padding Oracle",
+        "50_Bellare_Rogaway_1993_Random_Oracles.pdf",
+        "01_RFC8446_TLS_1_3_Specification.txt",
+        "Coppersmith (1996) - Lattice RSA Attacks"
+      ]
+    },
+    {
+      "query": "What was the practical impact of the Wang et al. collision attacks on MD5 and SHA-1?",
+      "gold_sources": [
+        "Wang et al. (2005) - MD5 & SHA-1 Collisions"
+      ],
+      "ranked_sources": [
+        "26_Wang_Yu_2005_MD5_Collisions.pdf",
+        "Wang et al. (2005) - MD5 & SHA-1 Collisions",
+        "25_Stevens_et_al_2017_SHA1_Collision_SHAttered.pdf"
+      ]
+    },
+    {
+      "query": "Explain how a padding oracle allows byte-by-byte decryption of CBC ciphertext.",
+      "gold_sources": [
+        "Vaudenay (2002) - CBC Padding Oracle"
+      ],
+      "ranked_sources": [
+        "Vaudenay (2002) - CBC Padding Oracle",
+        "56_Bernstein_2008_Salsa20_Family.pdf",
+        "09_RFC8439_ChaCha20_Poly1305.txt",
+        "03_NIST_FIPS_180_4_SHA2_Standard.pdf",
+        "Bleichenbacher (1998) - PKCS#1 Padding Oracle",
+        "33_Kelsey_et_al_1998_PRNG_Cryptanalytic_Attacks.pdf",
+        "50_Bellare_Rogaway_1993_Random_Oracles.pdf",
+        "37_Bernstein_2005_Cache_Timing_Attacks_AES.pdf",
+        "01_RFC8446_TLS_1_3_Specification.txt",
+        "25_Stevens_et_al_2017_SHA1_Collision_SHAttered.pdf",
+        "28_Biryukov_Khovratovich_2009_Related_Key_AES.pdf",
+        "06_NIST_FIPS_203_ML_KEM_Kyber_Standard.pdf"
+      ]
+    },
+    {
+      "query": "Which AEAD modes are recommended to replace CBC mode with padding?",
+      "gold_sources": [
+        "Vaudenay (2002) - CBC Padding Oracle"
+      ],
+      "ranked_sources": [
+        "09_RFC8439_ChaCha20_Poly1305.txt",
+        "Vaudenay (2002) - CBC Padding Oracle",
+        "01_RFC8446_TLS_1_3_Specification.txt",
+        "02_NIST_FIPS_197_AES_Specification.pdf",
+        "56_Bernstein_2008_Salsa20_Family.pdf",
+        "28_Biryukov_Khovratovich_2009_Related_Key_AES.pdf",
+        "37_Bernstein_2005_Cache_Timing_Attacks_AES.pdf",
+        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
+        "06_NIST_FIPS_203_ML_KEM_Kyber_Standard.pdf"
+      ]
+    },
+    {
+      "query": "What are the block sizes and key sizes supported by the AES cipher?",
+      "gold_sources": [
+        "02_NIST_FIPS_197_AES_Specification.pdf"
+      ],
+      "ranked_sources": [
+        "02_NIST_FIPS_197_AES_Specification.pdf",
+        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
+        "28_Biryukov_Khovratovich_2009_Related_Key_AES.pdf"
+      ]
+    },
+    {
+      "query": "What is the maximum differential probability of the AES S-box?",
+      "gold_sources": [
+        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
+        "Biham & Shamir (1991) - Differential Cryptanalysis"
+      ],
+      "ranked_sources": [
+        "Biham & Shamir (1991) - Differential Cryptanalysis",
+        "28_Biryukov_Khovratovich_2009_Related_Key_AES.pdf",
+        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
+        "Kocher et al. (1999) - Differential Power Analysis",
+        "27_Courtois_Pieprzyk_2002_Algebraic_Cryptanalysis_AES.pdf",
+        "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf",
+        "37_Bernstein_2005_Cache_Timing_Attacks_AES.pdf",
+        "Matsui (1993) - Linear Cryptanalysis"
+      ]
+    },
+    {
+      "query": "How does the boomerang attack combine two short differential characteristics?",
+      "gold_sources": [
+        "22_Wagner_1999_Boomerang_Attack.pdf"
+      ],
+      "ranked_sources": [
+        "28_Biryukov_Khovratovich_2009_Related_Key_AES.pdf",
+        "25_Stevens_et_al_2017_SHA1_Collision_SHAttered.pdf",
+        "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf",
+        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
+        "24_Biham_Biryukov_Shamir_1999_Impossible_Differential.pdf"
+      ]
+    },
+    {
+      "query": "What is the core idea of impossible differential cryptanalysis?",
+      "gold_sources": [
+        "24_Biham_Biryukov_Shamir_1999_Impossible_Differential.pdf"
+      ],
+      "ranked_sources": [
+        "Biham & Shamir (1991) - Differential Cryptanalysis",
+        "46_Diffie_Hellman_1976_New_Directions_in_Cryptography.pdf",
+        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
+        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
+        "Matsui (1993) - Linear Cryptanalysis",
+        "Kocher et al. (1999) - Differential Power Analysis",
+        "13_Dinur_Shamir_2009_Cube_Attacks.pdf",
+        "01_RFC8446_TLS_1_3_Specification.txt",
+        "56_Bernstein_2008_Salsa20_Family.pdf"
+      ]
+    },
+    {
+      "query": "How does Mouha et al. count the minimum number of active S-boxes for AES?",
+      "gold_sources": [
+        "20_Mouha_et_al_2011_MILP_Differential_Characteristics.pdf"
+      ],
+      "ranked_sources": [
+        "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf",
+        "37_Bernstein_2005_Cache_Timing_Attacks_AES.pdf",
+        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
+        "28_Biryukov_Khovratovich_2009_Related_Key_AES.pdf",
+        "56_Bernstein_2008_Salsa20_Family.pdf",
+        "02_NIST_FIPS_197_AES_Specification.pdf"
+      ]
+    },
+    {
+      "query": "How is mixed-integer linear programming used by Sun et al. for differential and linear cryptanalysis?",
+      "gold_sources": [
+        "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf"
+      ],
+      "ranked_sources": [
+        "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf",
+        "Matsui (1993) - Linear Cryptanalysis",
+        "27_Courtois_Pieprzyk_2002_Algebraic_Cryptanalysis_AES.pdf",
+        "13_Dinur_Shamir_2009_Cube_Attacks.pdf"
+      ]
+    },
+    {
+      "query": "What is zero-correlation linear cryptanalysis as introduced by Bogdanov et al.?",
+      "gold_sources": [
+        "21_Bogdanov_et_al_2012_Zero_Correlation_Linear_Cryptanalysis.pdf"
+      ],
+      "ranked_sources": [
+        "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf",
+        "Matsui (1993) - Linear Cryptanalysis",
+        "13_Dinur_Shamir_2009_Cube_Attacks.pdf",
+        "Goldwasser et al. (1989) - Zero Knowledge",
+        "08_NIST_FIPS_205_SLH_DSA_SPHINCS_Standard.pdf",
+        "10_RFC7748_Elliptic_Curves_Curve25519.txt",
+        "50_Bellare_Rogaway_1993_Random_Oracles.pdf",
+        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf"
+      ]
+    },
+    {
+      "query": "Who introduced cube attacks and what do they exploit?",
+      "gold_sources": [
+        "13_Dinur_Shamir_2009_Cube_Attacks.pdf"
+      ],
+      "ranked_sources": [
+        "13_Dinur_Shamir_2009_Cube_Attacks.pdf",
+        "25_Stevens_et_al_2017_SHA1_Collision_SHAttered.pdf",
+        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf"
+      ]
+    },
+    {
+      "query": "What is the division property and how does it enable integral attacks?",
+      "gold_sources": [
+        "17_Todo_2015_Division_Property_Integral_Attacks.pdf"
+      ],
+      "ranked_sources": [
+        "17_Todo_2015_Division_Property_Integral_Attacks.pdf"
+      ]
+    },
+    {
+      "query": "How do related-key attacks on AES-256 by Biryukov and Khovratovich work?",
+      "gold_sources": [
+        "28_Biryukov_Khovratovich_2009_Related_Key_AES.pdf"
+      ],
+      "ranked_sources": [
+        "28_Biryukov_Khovratovich_2009_Related_Key_AES.pdf",
+        "37_Bernstein_2005_Cache_Timing_Attacks_AES.pdf",
+        "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf",
+        "02_NIST_FIPS_197_AES_Specification.pdf",
+        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf"
+      ]
+    },
+    {
+      "query": "What approach does the Courtois-Pieprzyk algebraic attack use against AES?",
+      "gold_sources": [
+        "27_Courtois_Pieprzyk_2002_Algebraic_Cryptanalysis_AES.pdf"
+      ],
+      "ranked_sources": [
+        "28_Biryukov_Khovratovich_2009_Related_Key_AES.pdf",
+        "02_NIST_FIPS_197_AES_Specification.pdf",
+        "32_Marsaglia_1995_Diehard_Randomness_Tests.pdf",
+        "37_Bernstein_2005_Cache_Timing_Attacks_AES.pdf",
+        "27_Courtois_Pieprzyk_2002_Algebraic_Cryptanalysis_AES.pdf",
+        "09_RFC8439_ChaCha20_Poly1305.txt",
+        "54_Bernstein_2006_Curve25519.pdf",
+        "22_Wagner_1999_Boomerang_Attack.pdf",
+        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf"
+      ]
+    },
+    {
+      "query": "What did the Bernstein 2005 cache-timing analysis reveal about AES implementations?",
+      "gold_sources": [
+        "37_Bernstein_2005_Cache_Timing_Attacks_AES.pdf"
+      ],
+      "ranked_sources": [
+        "37_Bernstein_2005_Cache_Timing_Attacks_AES.pdf",
+        "02_NIST_FIPS_197_AES_Specification.pdf",
+        "09_RFC8439_ChaCha20_Poly1305.txt"
+      ]
+    },
+    {
+      "query": "What complexity did the SHAttered attack achieve for SHA-1 collisions?",
+      "gold_sources": [
+        "25_Stevens_et_al_2017_SHA1_Collision_SHAttered.pdf"
+      ],
+      "ranked_sources": [
+        "25_Stevens_et_al_2017_SHA1_Collision_SHAttered.pdf",
+        "Wang et al. (2005) - MD5 & SHA-1 Collisions",
+        "26_Wang_Yu_2005_MD5_Collisions.pdf"
+      ]
+    },
+    {
+      "query": "Which message modification techniques did Wang and Yu use to find MD5 collisions faster?",
+      "gold_sources": [
+        "26_Wang_Yu_2005_MD5_Collisions.pdf"
+      ],
+      "ranked_sources": [
+        "Wang et al. (2005) - MD5 & SHA-1 Collisions",
+        "26_Wang_Yu_2005_MD5_Collisions.pdf",
+        "25_Stevens_et_al_2017_SHA1_Collision_SHAttered.pdf"
+      ]
+    },
+    {
+      "query": "How is HMAC defined in RFC 2104?",
+      "gold_sources": [
+        "11_RFC2104_HMAC_Keyed_Hashing.txt"
+      ],
+      "ranked_sources": [
+        "11_RFC2104_HMAC_Keyed_Hashing.txt",
+        "01_RFC8446_TLS_1_3_Specification.txt",
+        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf"
+      ]
+    },
+    {
+      "query": "Where is the ChaCha20-Poly1305 AEAD construction specified for IETF protocols?",
+      "gold_sources": [
+        "09_RFC8439_ChaCha20_Poly1305.txt"
+      ],
+      "ranked_sources": [
+        "09_RFC8439_ChaCha20_Poly1305.txt",
+        "01_RFC8446_TLS_1_3_Specification.txt"
+      ]
+    },
+    {
+      "query": "Which elliptic curves are recommended in RFC 7748 and why?",
+      "gold_sources": [
+        "10_RFC7748_Elliptic_Curves_Curve25519.txt"
+      ],
+      "ranked_sources": [
+        "10_RFC7748_Elliptic_Curves_Curve25519.txt",
+        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
+        "53_Koblitz_1987_Elliptic_Curve_Cryptosystems.pdf",
+        "01_RFC8446_TLS_1_3_Specification.txt",
+        "22_Wagner_1999_Boomerang_Attack.pdf"
+      ]
+    },
+    {
+      "query": "Why did Bernstein design Curve25519 and what properties does it provide?",
+      "gold_sources": [
+        "54_Bernstein_2006_Curve25519.pdf"
+      ],
+      "ranked_sources": [
+        "10_RFC7748_Elliptic_Curves_Curve25519.txt",
+        "54_Bernstein_2006_Curve25519.pdf"
+      ]
+    },
+    {
+      "query": "What is the sponge construction used by SHA-3?",
+      "gold_sources": [
+        "04_NIST_FIPS_202_SHA3_Standard.pdf"
+      ],
+      "ranked_sources": [
+        "04_NIST_FIPS_202_SHA3_Standard.pdf",
+        "25_Stevens_et_al_2017_SHA1_Collision_SHAttered.pdf"
+      ]
+    },
+    {
+      "query": "How does the SHA-2 message schedule expand a message block?",
+      "gold_sources": [
+        "03_NIST_FIPS_180_4_SHA2_Standard.pdf"
+      ],
+      "ranked_sources": [
+        "03_NIST_FIPS_180_4_SHA2_Standard.pdf",
+        "25_Stevens_et_al_2017_SHA1_Collision_SHAttered.pdf",
+        "26_Wang_Yu_2005_MD5_Collisions.pdf",
+        "04_NIST_FIPS_202_SHA3_Standard.pdf",
+        "08_NIST_FIPS_205_SLH_DSA_SPHINCS_Standard.pdf"
+      ]
+    },
+    {
+      "query": "Which signatures are standardized in FIPS 186-5 and how do they relate to DSA/ECDSA?",
+      "gold_sources": [
+        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf"
+      ],
+      "ranked_sources": [
+        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
+        "08_NIST_FIPS_205_SLH_DSA_SPHINCS_Standard.pdf",
+        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf"
+      ]
+    },
+    {
+      "query": "What hard problem does ML-KEM (Kyber) base its security on?",
+      "gold_sources": [
+        "06_NIST_FIPS_203_ML_KEM_Kyber_Standard.pdf"
+      ],
+      "ranked_sources": [
+        "06_NIST_FIPS_203_ML_KEM_Kyber_Standard.pdf"
+      ]
+    },
+    {
+      "query": "Which security parameter sets does ML-KEM define?",
+      "gold_sources": [
+        "06_NIST_FIPS_203_ML_KEM_Kyber_Standard.pdf"
+      ],
+      "ranked_sources": [
+        "06_NIST_FIPS_203_ML_KEM_Kyber_Standard.pdf",
+        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf"
+      ]
+    },
+    {
+      "query": "What is the underlying signature construction of ML-DSA (Dilithium)?",
+      "gold_sources": [
+        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf"
+      ],
+      "ranked_sources": [
+        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf"
+      ]
+    },
+    {
+      "query": "What security model does SLH-DSA (SPHINCS+) rely on?",
+      "gold_sources": [
+        "08_NIST_FIPS_205_SLH_DSA_SPHINCS_Standard.pdf"
+      ],
+      "ranked_sources": [
+        "08_NIST_FIPS_205_SLH_DSA_SPHINCS_Standard.pdf",
+        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf"
+      ]
+    },
+    {
+      "query": "What are the statistical tests of randomness described in NIST SP 800-22?",
+      "gold_sources": [
+        "12_NIST_SP_800_22_Statistical_Tests_RNG.pdf"
+      ],
+      "ranked_sources": [
+        "12_NIST_SP_800_22_Statistical_Tests_RNG.pdf"
+      ]
+    },
+    {
+      "query": "How do the Diehard randomness tests work?",
+      "gold_sources": [
+        "32_Marsaglia_1995_Diehard_Randomness_Tests.pdf"
+      ],
+      "ranked_sources": [
+        "12_NIST_SP_800_22_Statistical_Tests_RNG.pdf"
+      ]
+    },
+    {
+      "query": "What cryptanalytic attacks on PRNGs were presented by Kelsey et al.?",
+      "gold_sources": [
+        "33_Kelsey_et_al_1998_PRNG_Cryptanalytic_Attacks.pdf"
+      ],
+      "ranked_sources": [
+        "Bleichenbacher (1998) - PKCS#1 Padding Oracle",
+        "54_Bernstein_2006_Curve25519.pdf",
+        "46_Diffie_Hellman_1976_New_Directions_in_Cryptography.pdf",
+        "25_Stevens_et_al_2017_SHA1_Collision_SHAttered.pdf",
+        "13_Dinur_Shamir_2009_Cube_Attacks.pdf",
+        "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf",
+        "28_Biryukov_Khovratovich_2009_Related_Key_AES.pdf",
+        "27_Courtois_Pieprzyk_2002_Algebraic_Cryptanalysis_AES.pdf",
+        "22_Wagner_1999_Boomerang_Attack.pdf",
+        "18_Todo_Morii_2016_Bit_Based_Division_Property_SIMON.pdf",
+        "06_NIST_FIPS_203_ML_KEM_Kyber_Standard.pdf",
+        "37_Bernstein_2005_Cache_Timing_Attacks_AES.pdf",
+        "16_Dinur_et_al_2015_Cube_Attacks_SIMON.pdf",
+        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf",
+        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf"
+      ]
+    },
+    {
+      "query": "Describe the Diffie-Hellman key exchange protocol.",
+      "gold_sources": [
+        "46_Diffie_Hellman_1976_New_Directions_in_Cryptography.pdf"
+      ],
+      "ranked_sources": [
+        "24_Biham_Biryukov_Shamir_1999_Impossible_Differential.pdf",
+        "01_RFC8446_TLS_1_3_Specification.txt",
+        "46_Diffie_Hellman_1976_New_Directions_in_Cryptography.pdf",
+        "16_Dinur_et_al_2015_Cube_Attacks_SIMON.pdf",
+        "06_NIST_FIPS_203_ML_KEM_Kyber_Standard.pdf"
+      ]
+    },
+    {
+      "query": "How does the RSA cryptosystem define key generation, encryption and decryption?",
+      "gold_sources": [
+        "47_Rivest_Shamir_Adleman_1978_RSA_Cryptosystem.pdf"
+      ],
+      "ranked_sources": [
+        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
+        "50_Bellare_Rogaway_1993_Random_Oracles.pdf",
+        "06_NIST_FIPS_203_ML_KEM_Kyber_Standard.pdf",
+        "33_Kelsey_et_al_1998_PRNG_Cryptanalytic_Attacks.pdf",
+        "08_NIST_FIPS_205_SLH_DSA_SPHINCS_Standard.pdf",
+        "01_RFC8446_TLS_1_3_Specification.txt",
+        "Bleichenbacher (1998) - PKCS#1 Padding Oracle",
+        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf"
+      ]
+    },
+    {
+      "query": "What is the definition of zero-knowledge proof systems by Goldwasser, Micali and Rackoff?",
+      "gold_sources": [
+        "Goldwasser et al. (1989) - Zero Knowledge"
+      ],
+      "ranked_sources": [
+        "Goldwasser et al. (1989) - Zero Knowledge",
+        "50_Bellare_Rogaway_1993_Random_Oracles.pdf",
+        "21_Bogdanov_et_al_2012_Zero_Correlation_Linear_Cryptanalysis.pdf",
+        "17_Todo_2015_Division_Property_Integral_Attacks.pdf",
+        "46_Diffie_Hellman_1976_New_Directions_in_Cryptography.pdf",
+        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf",
+        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
+        "08_NIST_FIPS_205_SLH_DSA_SPHINCS_Standard.pdf"
+      ]
+    },
+    {
+      "query": "What is the random oracle model as formalized by Bellare and Rogaway?",
+      "gold_sources": [
+        "50_Bellare_Rogaway_1993_Random_Oracles.pdf"
+      ],
+      "ranked_sources": [
+        "50_Bellare_Rogaway_1993_Random_Oracles.pdf"
+      ]
+    },
+    {
+      "query": "Why is the Cramer-Shoup cryptosystem CCA-secure?",
+      "gold_sources": [
+        "52_Cramer_Shoup_1998_CCA_Secure_Public_Key.pdf"
+      ],
+      "ranked_sources": [
+        "33_Kelsey_et_al_1998_PRNG_Cryptanalytic_Attacks.pdf",
+        "03_NIST_FIPS_180_4_SHA2_Standard.pdf",
+        "46_Diffie_Hellman_1976_New_Directions_in_Cryptography.pdf",
+        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf",
+        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
+        "20_Mouha_et_al_2011_MILP_Differential_Characteristics.pdf",
+        "09_RFC8439_ChaCha20_Poly1305.txt",
+        "16_Dinur_et_al_2015_Cube_Attacks_SIMON.pdf",
+        "24_Biham_Biryukov_Shamir_1999_Impossible_Differential.pdf"
+      ]
+    },
+    {
+      "query": "What did Koblitz propose regarding elliptic curve cryptosystems?",
+      "gold_sources": [
+        "53_Koblitz_1987_Elliptic_Curve_Cryptosystems.pdf"
+      ],
+      "ranked_sources": [
+        "53_Koblitz_1987_Elliptic_Curve_Cryptosystems.pdf",
+        "10_RFC7748_Elliptic_Curves_Curve25519.txt",
+        "22_Wagner_1999_Boomerang_Attack.pdf",
+        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
+        "54_Bernstein_2006_Curve25519.pdf"
+      ]
+    },
+    {
+      "query": "How is the ChaCha cipher defined by Bernstein?",
+      "gold_sources": [
+        "55_Bernstein_2008_ChaCha_Cipher.pdf"
+      ],
+      "ranked_sources": [
+        "09_RFC8439_ChaCha20_Poly1305.txt",
+        "55_Bernstein_2008_ChaCha_Cipher.pdf",
+        "56_Bernstein_2008_Salsa20_Family.pdf",
+        "27_Courtois_Pieprzyk_2002_Algebraic_Cryptanalysis_AES.pdf",
+        "46_Diffie_Hellman_1976_New_Directions_in_Cryptography.pdf"
+      ]
+    },
+    {
+      "query": "What are the properties of the Salsa20 family of stream ciphers?",
+      "gold_sources": [
+        "56_Bernstein_2008_Salsa20_Family.pdf"
+      ],
+      "ranked_sources": [
+        "56_Bernstein_2008_Salsa20_Family.pdf",
+        "55_Bernstein_2008_ChaCha_Cipher.pdf",
+        "09_RFC8439_ChaCha20_Poly1305.txt",
+        "54_Bernstein_2006_Curve25519.pdf",
+        "13_Dinur_Shamir_2009_Cube_Attacks.pdf"
+      ]
+    },
+    {
+      "query": "What is the Learning With Errors (LWE) problem and why is it important?",
+      "gold_sources": [
+        "59_Regev_2005_Learning_With_Errors_LWE.pdf"
+      ],
+      "ranked_sources": [
+        "06_NIST_FIPS_203_ML_KEM_Kyber_Standard.pdf",
+        "01_RFC8446_TLS_1_3_Specification.txt",
+        "18_Todo_Morii_2016_Bit_Based_Division_Property_SIMON.pdf",
+        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf",
+        "12_NIST_SP_800_22_Statistical_Tests_RNG.pdf",
+        "37_Bernstein_2005_Cache_Timing_Attacks_AES.pdf",
+        "33_Kelsey_et_al_1998_PRNG_Cryptanalytic_Attacks.pdf"
+      ]
+    }
+  ]
+}
