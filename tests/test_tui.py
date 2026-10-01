@@ -240,3 +240,132 @@ def test_acceptable_translation_heuristic():
     assert RAGPipeline._acceptable_translation(
         "Explain the cube attack", "bana küp atağı anlat") is True
 
+
+# --------------------------------------------------------------- documents
+DOCS_STUB = [
+    {"source": "RFC 1", "title": "RFC 1: TLS 1.3", "type": "RFC Document",
+     "url": "", "chunk_count": 500},
+    {"source": "RFC 2", "title": "RFC 2: HKDF", "type": "RFC Document",
+     "url": "", "chunk_count": 25},
+    {"source": "SP 1", "title": "SP 800-38D GCM", "type": "NIST Standard",
+     "url": "", "chunk_count": 85},
+    {"source": "a.pdf", "title": "Linear Cryptanalysis", "type": "Cryptanalysis Paper",
+     "url": "", "chunk_count": 120},
+]
+
+
+class StubDocsPipeline:
+    def list_documents(self):
+        return [dict(d) for d in DOCS_STUB]
+
+
+async def _open_docs(app, pilot):
+    from crypto_rag.tui import DocumentsScreen
+    app.push_screen(DocumentsScreen(StubDocsPipeline()))
+    for _ in range(30):
+        await pilot.pause(0.05)
+        if app.screen.query("#docs-table"):
+            return
+
+
+def _table(app):
+    from textual.widgets import DataTable
+    return app.screen.query_one("#docs-table", DataTable)
+
+
+def test_documents_screen_lists_rows():
+    async def main():
+        app = ChatApp()
+        async with app.run_test() as pilot:
+            await _open_docs(app, pilot)
+            table = _table(app)
+            assert table.row_count == 4
+            # default sort: chunks descending -> TLS 1.3 first
+            first = table.get_row_at(0)
+            assert first[0] == "1"
+            assert first[1] == "RFC 1: TLS 1.3"
+            assert first[3] == "500"
+            assert app.screen.query_one("#docs-type", Select)
+            assert app.screen.query_one("#docs-search", Input)
+
+    _run(main())
+
+
+def test_documents_screen_type_filter():
+    async def main():
+        app = ChatApp()
+        async with app.run_test() as pilot:
+            await _open_docs(app, pilot)
+            sel = app.screen.query_one("#docs-type", Select)
+            sel.value = "RFC Document"
+            await pilot.pause()
+            assert _table(app).row_count == 2
+
+    _run(main())
+
+
+def test_documents_screen_search():
+    async def main():
+        app = ChatApp()
+        async with app.run_test() as pilot:
+            await _open_docs(app, pilot)
+            search = app.screen.query_one("#docs-search", Input)
+            search.value = "gcm"
+            await pilot.pause()
+            table = _table(app)
+            assert table.row_count == 1
+            assert table.get_row_at(0)[1] == "SP 800-38D GCM"
+
+    _run(main())
+
+
+def test_documents_screen_sorts_on_header_click():
+    from rich.text import Text
+    from textual.widgets import DataTable
+
+    async def main():
+        app = ChatApp()
+        async with app.run_test() as pilot:
+            await _open_docs(app, pilot)
+            table = _table(app)
+            # simulate clicking the "Başlık" header -> screen sorts ascending
+            table.post_message(DataTable.HeaderSelected(
+                table, "title", 1, Text("Başlık")))
+            await pilot.pause()
+            rows = [table.get_row_at(i)[1] for i in range(table.row_count)]
+            assert rows == ["Linear Cryptanalysis", "RFC 1: TLS 1.3",
+                            "RFC 2: HKDF", "SP 800-38D GCM"]
+
+    _run(main())
+
+
+def test_documents_command_opens_screen():
+    from crypto_rag.tui import DocumentsScreen
+
+    async def main():
+        app = ChatApp()
+        async with app.run_test() as pilot:
+            app.pipeline = StubDocsPipeline()
+            qinput = app.query_one("#qinput", Input)
+            qinput.value = "/documents"
+            await qinput.action_submit()
+            await pilot.pause()
+            assert isinstance(app.screen, DocumentsScreen)
+
+    _run(main())
+
+
+def test_documents_screen_closes():
+    from crypto_rag.tui import DocumentsScreen
+
+    async def main():
+        app = ChatApp()
+        async with app.run_test() as pilot:
+            await _open_docs(app, pilot)
+            assert isinstance(app.screen, DocumentsScreen)
+            app.screen.action_close_docs()
+            await pilot.pause()
+            assert not isinstance(app.screen, DocumentsScreen)
+
+    _run(main())
+

@@ -17,10 +17,13 @@ Generation System for Cryptography and Cryptanalysis"* (see `paper/`).
 
 - **Fully local & private** — embeddings (`nomic-embed-text`) and generation
   (`qwen3.5:9b`, `gemma4:26b`) run on your own machine via Ollama.
-- **Curated knowledge base** — 40+ documents: NIST FIPS (AES, SHA-2/3, DSA,
-  ML-KEM, ML-DSA, SLH-DSA, SP 800-22), IETF RFCs (TLS 1.3, ChaCha20-Poly1305,
-  Curve25519, HMAC), and landmark papers (differential/linear cryptanalysis,
-  DPA, padding oracles, Coppersmith, SHA-1 collisions, and more).
+- **Curated knowledge base** — 80+ documents: NIST FIPS & SP 800 (AES, SHA-2/3,
+  ML-KEM, ML-DSA, SLH-DSA, block-cipher modes GCM/CCM/XTS, DRBG, KDF, key
+  management, SP 800-22/38/56/57/90/107/108/131/133/185/186/208), IETF RFCs
+  (TLS 1.2/1.3, RSA-PKCS#1, Ed25519, HKDF, HPKE, SSH, X.509, JOSE, CMS, AES-CMAC,
+  AEAD, BLAKE2, Curve25519, ChaCha20-Poly1305, HMAC), and landmark papers
+  (differential/linear cryptanalysis, DPA, padding oracles, Coppersmith,
+  SHA-1 collisions, and more).
 - **Citation-aware answers** — every answer cites the retrieved sources
   inline as `[SOURCE n: title]`, with a hallucination-guard system prompt.
 - **Hybrid retrieval** — reciprocal-rank fusion of dense vector search and a
@@ -48,10 +51,14 @@ cryptorag           # equivalent to `cryptorag chat`
   (Ollama + any OpenAI-compatible provider) plus auto-discovered local Ollama
   models; set Top-K and filter by document type
 - Answer footer shows model, response time, token count, and sources used
-- Slash commands: `/help`, `/stats`, `/new`, `/clear`, `/save`, `/load`,
-  `/copy`, `/ingest-rfc N`, `/ingest-url URL`, `/ingest-file PATH`, `/quit`
+- **Document table** — `ctrl+o` or `/documents` opens a full-screen view of all
+  indexed documents (title, type, chunk count, source) with type filter,
+  live search, and sortable columns (click a header)
+- Slash commands: `/help`, `/stats`, `/documents`, `/new`, `/clear`, `/save`,
+  `/load`, `/copy`, `/ingest-rfc N`, `/ingest-url URL`, `/ingest-file PATH`,
+  `/quit`
 - Shortcuts: `ctrl+c` / `esc` cancel generation, `ctrl+y` copy last answer,
-  `ctrl+q` quit, `ctrl+l` clear the chat
+  `ctrl+o` documents, `ctrl+q` quit, `ctrl+l` clear the chat
 - Sessions persist under `data/sessions/` via `/save` and `/load`; generation
   runs on a worker thread so the UI stays responsive
 
@@ -66,7 +73,7 @@ cryptorag           # equivalent to `cryptorag chat`
                     VectorStore (ChromaDB)        LLM provider (Ollama/OpenAI)
                     cosine, nomic-embed-text      qwen3.5:9b / gemma4:26b
                               |
-                 Knowledge base (46 docs / ~3.6k chunks)
+                 Knowledge base (82 docs / ~8k chunks)
                  RFCs | NIST standards | landmark papers
 ```
 
@@ -105,7 +112,7 @@ make install
 ollama serve &
 make models          # ollama pull nomic-embed-text + qwen3.5:9b
 
-# 3. Build the knowledge base (embeds ~3.6k chunks once)
+# 3. Build the knowledge base (embeds ~8k chunks once)
 make index           # or: make index-reset to rebuild from scratch
 
 # 4. Ask a question (from anywhere)
@@ -254,7 +261,8 @@ cryptorag eval --answer 15 --judge --judge-model gemma4:26b
 ```
 
 Outputs land in `results/`: per-retriever JSON, a summary, LaTeX-ready tables
-and `retrieval_curves.png`. Current results (49 questions, 46 documents):
+and `retrieval_curves.png`. Results (49 questions) measured on the earlier
+46-document corpus:
 
 | retriever | hit@5 | hit@10 | MRR@5 | nDCG@5 |
 | :-------- | ----: | -----: | ----: | -----: |

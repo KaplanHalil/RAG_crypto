@@ -48,9 +48,10 @@ class Document:
 def classify_doc_type(filename: str) -> str:
     """Heuristic doc-type classification based on the file name."""
     fn = filename.upper()
-    if "NIST" in fn or "FIPS" in fn or "SP_800" in fn:
+    # word-bounded so "NIST" does not match inside e.g. "DETERMINISTIC"
+    if re.search(r"(?:^|[_\- ])(NIST|FIPS|SP[_\- ]?800)", fn):
         return "NIST Standard"
-    if "RFC" in fn:
+    if re.search(r"(?:^|[_\- ])RFC", fn):
         return "RFC Document"
     attack_terms = ("ATTACK", "COLLISION", "CRYPTANALYSIS", "IMPOSSIBLE",
                     "BOOMERANG", "TIMING", "CUBE", "RELATED_KEY", "ZERO")

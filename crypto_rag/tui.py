@@ -22,8 +22,10 @@ from typing import Any, List, Optional
 import requests
 
 from textual.app import App, ComposeResult
-from textual.containers import Horizontal, VerticalScroll
-from textual.widgets import Footer, Input, Label, Markdown, Select, Static
+from textual.binding import Binding
+from textual.containers import Horizontal, Vertical, VerticalScroll
+from textual.screen import Screen
+from textual.widgets import DataTable, Footer, Input, Label, Markdown, Select, Static
 
 from .config import get_settings, PROJECT_ROOT
 from .embeddings import build_embedding_provider
@@ -117,6 +119,179 @@ def _ollama_models(base_url: str, embedding_model: str) -> List[str]:
     return []
 
 
+class DocumentsScreen(Screen):
+    """Full-screen, sortable & filterable document table.
+
+    Opened from the chat with ``ctrl+o`` or ``/documents``. Shows every
+    indexed document with its type and chunk count; rows can be filtered by
+    type and a search string and sorted by clicking column headers.
+    """
+
+    BINDINGS = [
+        ("escape", "close_docs", "Close"),
+        ("q", "close_docs", "Close"),
+    ]
+    CSS = """
+    #docs-screen {
+        height: 100%;
+        background: #0b0c0f;
+    }
+    Label#docs-title {
+        padding: 1 2 0 2;
+        color: #6ea8fe;
+        text-style: bold;
+    }
+    #docs-filterbar {
+        height: auto;
+        padding: 0 2;
+        align: left middle;
+    }
+    #docs-filterbar .lbl {
+        color: #7c7f8c;
+        margin: 0 0 0 1;
+    }
+    #docs-filterbar Select {
+        min-width: 20;
+        margin: 1 0 1 1;
+        border: round #26282e;
+        background: #181a20;
+    }
+    #docs-filterbar Input {
+        min-width: 30;
+        margin: 1 0 1 1;
+        border: round #26282e;
+        background: #181a20;
+    }
+    DataTable#docs-table {
+        height: 1fr;
+        margin: 0 1;
+        color: #d6d8de;
+    }
+    DataTable#docs-table > .datatable--header {
+        background: #131418;
+        color: #6ea8fe;
+        text-style: bold;
+    }
+    DataTable#docs-table > .datatable--cursor {
+        background: #1a1c22;
+        color: #d6d8de;
+    }
+    DataTable#docs-table > .datatable--odd-row {
+        background: #0e0f12;
+    }
+    Label#docs-summary {
+        height: 1;
+        padding: 0 2;
+        color: #7c7f8c;
+        content-align: left middle;
+    }
+    """
+
+    def __init__(self, pipeline: "RAGPipeline", **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self.pipeline = pipeline
+        self._docs: List[dict] = []
+        self._type_filter: str = "All"
+        self._search: str = ""
+        self._sort_col: str = "chunks"
+        self._sort_desc: bool = True
+
+    def compose(self) -> ComposeResult:
+        with Vertical(id="docs-screen"):
+            yield Label("", id="docs-title")
+            with Horizontal(id="docs-filterbar"):
+                yield Label("Type", classes="lbl")
+                yield Select([(t, t) for t in DOC_TYPES], value="All",
+                             id="docs-type")
+                yield Label("Search", classes="lbl")
+                yield Input(placeholder="başlık / kaynak ara…", id="docs-search")
+            yield DataTable(id="docs-table")
+            yield Label("", id="docs-summary")
+        yield Footer()
+
+    def on_mount(self) -> None:
+        table = self.query_one("#docs-table", DataTable)
+        table.add_columns("#", "Başlık", "Tip", "Chunk", "Kaynak")
+        table.cursor_type = "row"
+        table.zebra_stripes = True
+        self._docs = self.pipeline.list_documents()
+        self._populate()
+        self.query_one("#docs-search", Input).focus()
+
+    # ---------------------------------------------------------------- filter
+    def on_select_changed(self, event: Select.Changed) -> None:
+        if event.select.id == "docs-type":
+            self._type_filter = event.value
+            self._populate()
+
+    def on_input_changed(self, event: Input.Changed) -> None:
+        if event.input.id == "docs-search":
+            self._search = event.value
+            self._populate()
+
+    def on_data_table_header_selected(self,
+                                      event: DataTable.HeaderSelected) -> None:
+        mapping = {0: "order", 1: "title", 2: "type", 3: "chunks", 4: "source"}
+        col = mapping.get(event.column_index, "title")
+        if col == self._sort_col:
+            self._sort_desc = not self._sort_desc
+        else:
+            self._sort_col, self._sort_desc = col, False
+        self._populate()
+
+    # ---------------------------------------------------------------- render
+    def _filtered(self) -> List[dict]:
+        docs = self._docs
+        if self._type_filter != "All":
+            docs = [d for d in docs if d.get("type") == self._type_filter]
+        if self._search:
+            needle = self._search.lower()
+            docs = [d for d in docs
+                    if needle in d.get("title", "").lower()
+                    or needle in d.get("source", "").lower()]
+        return docs
+
+    def _sorted(self, docs: List[dict]) -> List[dict]:
+        col, desc = self._sort_col, self._sort_desc
+        if col == "chunks":
+            docs = sorted(docs, key=lambda d: d.get("chunk_count", 0),
+                          reverse=desc)
+        elif col == "title":
+            docs = sorted(docs, key=lambda d: d.get("title", "").lower(),
+                          reverse=desc)
+        elif col == "type":
+            docs = sorted(docs, key=lambda d: d.get("type", ""), reverse=desc)
+        elif col == "source":
+            docs = sorted(docs, key=lambda d: d.get("source", "").lower(),
+                          reverse=desc)
+        return docs
+
+    def _populate(self) -> None:
+        table = self.query_one("#docs-table", DataTable)
+        docs = self._sorted(self._filtered())
+        table.clear()
+        for i, d in enumerate(docs, 1):
+            table.add_row(
+                str(i), d.get("title", ""), d.get("type", ""),
+                str(d.get("chunk_count", 0)), d.get("source", ""),
+                key=d.get("source", f"doc-{i}"),
+            )
+
+        total_docs = len(self._docs)
+        total_chunks = sum(d.get("chunk_count", 0) for d in self._docs)
+        shown_chunks = sum(d.get("chunk_count", 0) for d in docs)
+        arrow = "▼" if self._sort_desc else "▲"
+        self.query_one("#docs-title", Label).update(
+            f"Documents — {total_docs} doküman, {total_chunks} chunk")
+        self.query_one("#docs-summary", Label).update(
+            f"gösterilen: {len(docs)} doküman / {shown_chunks} chunk"
+            f"    ·  {self._type_filter}  ·  sıralama: {self._sort_col} {arrow}"
+            f"    ·  filtre: {self._search or '—'}")
+
+    def action_close_docs(self) -> None:
+        self.app.pop_screen()
+
+
 class ChatApp(App):
     """CryptoRAG terminal chat."""
 
@@ -124,9 +299,10 @@ class ChatApp(App):
     BINDINGS = [
         ("ctrl+q", "quit", "Quit"),
         ("ctrl+l", "clear_chat", "Clear chat"),
-        ("ctrl+c", "cancel_generation", "Cancel"),
+        Binding("ctrl+c", "cancel_generation", "Cancel", priority=True),
         ("escape", "cancel_generation", "Cancel"),
         ("ctrl+y", "copy_last", "Copy"),
+        ("ctrl+o", "open_documents", "Documents"),
     ]
     TITLE = "CryptoRAG — Terminal"
 
@@ -357,6 +533,12 @@ class ChatApp(App):
         self.copy_to_clipboard(self._last_answer)
         self._info("Last answer copied to the clipboard.")
 
+    def action_open_documents(self) -> None:
+        if self.pipeline is None:
+            self._info("Knowledge base is not initialized.")
+            return
+        self.push_screen(DocumentsScreen(self.pipeline))
+
     # -------------------------------------------------------------- messages
     def _append_message(self, role: str, text: str) -> Markdown:
         chat = self.query_one("#chat", VerticalScroll)
@@ -432,12 +614,13 @@ class ChatApp(App):
                 "  /save            persist the session to disk\n"
                 "  /load            restore the saved session\n"
                 "  /copy            copy the last answer\n"
+                "  /documents       show all documents (table view)\n"
                 "  /ingest-rfc N    fetch and index IETF RFC N\n"
                 "  /ingest-url URL  scrape and index a web page\n"
                 "  /ingest-file P   index a local PDF/TXT/MD file\n"
                 "  /quit            exit\n\n"
                 "Shortcuts: ctrl+q quit · ctrl+l clear · ctrl+c/esc cancel · "
-                "ctrl+y copy.\n"
+                "ctrl+y copy · ctrl+o documents.\n"
                 "Select the model, Top-K and document type in the top bar."
             )
         elif cmd == "/stats":
@@ -465,6 +648,8 @@ class ChatApp(App):
             self._load_session(arg)
         elif cmd == "/copy":
             self.action_copy_last()
+        elif cmd in ("/documents", "/docs"):
+            self.action_open_documents()
         elif cmd == "/quit" or cmd == "/exit":
             self.exit()
         elif cmd in ("/ingest-rfc", "/ingest-url", "/ingest-file"):
