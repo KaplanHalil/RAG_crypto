@@ -1,0 +1,37 @@
+{
+  "$schema": "https://example.org/cryptorag-schema.json",
+  "comment": "Copy to cryptorag.json (repo root) or ~/.config/cryptorag/config.json. Global config is merged under the project file. API keys use env:VAR_NAME and are resolved from the environment.",
+  "provider": {
+    "ollama": {
+      "type": "ollama",
+      "base_url": "http://localhost:11434",
+      "models": {
+        "qwen3.5:9b": { "name": "Qwen 3.5 9B" },
+        "gemma4:26b": { "name": "Gemma 4 26B" }
+      }
+    },
+    "openai": {
+      "type": "openai",
+      "options": { "api_key": "env:OPENAI_API_KEY" },
+      "models": {
+        "gpt-4o-mini": { "name": "GPT-4o mini" },
+        "gpt-4o": { "name": "GPT-4o" }
+      }
+    },
+    "groq": {
+      "type": "openai",
+      "base_url": "https://api.groq.com/openai/v1",
+      "options": { "api_key": "env:GROQ_API_KEY" },
+      "models": {
+        "llama-3.3-70b-versatile": { "name": "Llama 3.3 70B (Groq)" }
+      }
+    }
+  },
+  "embedding": {
+    "provider": "ollama",
+    "model": "nomic-embed-text"
+  },
+  "defaults": {
+    "llm": "qwen3.5:9b"
+  }
+}

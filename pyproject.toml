@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "crypto-rag"
+version = "1.0.0"
+description = "CryptoRAG: a locally-deployable, citation-aware retrieval-augmented generation system for cryptography and cryptanalysis."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "CryptoRAG" }]
+dependencies = [
+    "chromadb>=1.5.0",
+    "pypdf>=4.0",
+    "beautifulsoup4>=4.12",
+    "requests>=2.31",
+    "pydantic>=2.6",
+    "pydantic-settings>=2.2",
+    "python-dotenv>=1.0",
+    "openai>=1.30",
+    "textual>=8.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "matplotlib>=3.8",
+]
+
+[project.scripts]
+cryptorag = "crypto_rag.cli:main"
+
+[tool.setuptools]
+packages = ["crypto_rag"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

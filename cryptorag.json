@@ -1,0 +1,28 @@
+{
+  "provider": {
+    "ollama": {
+      "type": "ollama",
+      "base_url": "http://localhost:11434",
+      "models": {
+        "qwen3.5:9b": { "name": "Qwen3.5 9B (local)" },
+        "gemma4:26b": { "name": "Gemma4 26B (local)" }
+      }
+    },
+    "tubitak-qwen": {
+      "type": "openai",
+      "base_url": "https://ai-api.tubitak.gov.tr/vllm/qwen3coder-80b/v1",
+      "models": {
+        "Qwen3Coder-80B": {
+          "name": "Qwen3Coder-80B (TÜBİTAK)"
+        }
+      }
+    }
+  },
+  "embedding": {
+    "provider": "ollama",
+    "model": "nomic-embed-text"
+  },
+  "defaults": {
+    "llm": "qwen3.5:9b"
+  }
+}

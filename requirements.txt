@@ -4,11 +4,6 @@ pypdf>=4.0
 beautifulsoup4>=4.12
 requests>=2.31
 
-# --- Web server ---
-fastapi>=0.110
-uvicorn[standard]>=0.29
-python-multipart>=0.0.9
-
 # --- Config & utilities ---
 pydantic>=2.6
 pydantic-settings>=2.2

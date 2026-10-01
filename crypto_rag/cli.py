@@ -1,16 +1,18 @@
 """Command-line interface for CryptoRAG.
 
+Running ``cryptorag`` with no arguments launches the interactive terminal UI.
+
 Usage::
 
-    python -m crypto_rag.cli index-corpus
-    python -m crypto_rag.cli query "How does linear cryptanalysis work?"
-    python -m crypto_rag.cli query --top-k 8 --model qwen3.5:9b "question"
-    python -m crypto_rag.cli ingest-rfc 9180
-    python -m crypto_rag.cli ingest-file path/to/paper.pdf
-    python -m crypto_rag.cli summarize "RFC 8446"
-    python -m crypto_rag.cli stats
-    python -m crypto_rag.cli serve
-    python -m crypto_rag.cli eval
+    cryptorag                      # launch the TUI
+    cryptorag index-corpus
+    cryptorag query "How does linear cryptanalysis work?"
+    cryptorag query --top-k 8 --model qwen3.5:9b "question"
+    cryptorag ingest-rfc 9180
+    cryptorag ingest-file path/to/paper.pdf
+    cryptorag summarize "RFC 8446"
+    cryptorag stats
+    cryptorag eval
 """
 
 from __future__ import annotations
@@ -18,7 +20,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-from .config import get_settings
+from .config import get_settings, PROJECT_ROOT
 from .embeddings import build_embedding_provider
 from .llm import build_llm_provider
 from .pipeline import RAGPipeline
@@ -42,9 +44,9 @@ def cmd_stats(_: argparse.Namespace) -> None:
 def cmd_query(args: argparse.Namespace) -> None:
     settings, pipeline = _build_pipeline()
     question = " ".join(args.question)
-    if settings.llm_backend == "ollama" and args.model:
-        from .llm import OllamaLLM
-        pipeline.llm = OllamaLLM(args.model, settings.ollama_base_url)
+    if args.model:
+        from .models import build_llm
+        pipeline.llm = build_llm(args.model)
     result = pipeline.query(
         question, top_k=args.top_k,
         doc_type_filter=args.type)
@@ -88,14 +90,27 @@ def cmd_index_corpus(args: argparse.Namespace) -> None:
                  only_landmark=args.only_landmark)
 
 
-def cmd_serve(args: argparse.Namespace) -> None:
-    import uvicorn
-    uvicorn.run("app:app", host=args.host, port=args.port, reload=False)
-
-
 def cmd_chat(_: argparse.Namespace) -> None:
     from .tui import run
     run()
+
+
+def cmd_serve(args: argparse.Namespace) -> None:
+    from .server import serve
+    serve(host=args.host, port=args.port)
+
+
+def cmd_config(args: argparse.Namespace) -> None:
+    import json
+    from .models import config_file_used, get_registry
+
+    path = config_file_used()
+    if path is None:
+        print("No cryptorag.json found. Using environment-driven settings "
+              "(see .env.example).")
+        return
+    print(f"Config file: {path}")
+    print(json.dumps(get_registry().effective(redact=True), indent=2))
 
 
 def cmd_eval(args: argparse.Namespace) -> None:
@@ -111,7 +126,8 @@ def cmd_eval(args: argparse.Namespace) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="crypto_rag", description="CryptoRAG CLI")
-    sub = p.add_subparsers(dest="command", required=True)
+    p.set_defaults(func=cmd_chat)
+    sub = p.add_subparsers(dest="command")
 
     sp = sub.add_parser("stats", help="show knowledge-base statistics")
     sp.set_defaults(func=cmd_stats)
@@ -120,7 +136,7 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("question", nargs="+")
     sp.add_argument("--top-k", type=int, default=None)
     sp.add_argument("--model", default=None,
-                    help="override LLM (Ollama backend only)")
+                    help="override LLM (any model from cryptorag.json)")
     sp.add_argument("--type", default=None,
                     help="filter: RFC Document | NIST Standard | "
                          "Cryptanalysis Paper | Cryptography Paper | All")
@@ -150,17 +166,21 @@ def build_parser() -> argparse.ArgumentParser:
                     help="index only the curated landmark papers")
     sp.set_defaults(func=cmd_index_corpus)
 
-    sp = sub.add_parser("serve", help="run the FastAPI web server")
+    sp = sub.add_parser("chat", help="launch the interactive terminal UI")
+    sp.set_defaults(func=cmd_chat)
+
+    sp = sub.add_parser("serve", help="run the HTTP API server")
     sp.add_argument("--host", default="0.0.0.0")
     sp.add_argument("--port", type=int, default=8000)
     sp.set_defaults(func=cmd_serve)
 
-    sp = sub.add_parser("chat", help="launch the interactive terminal UI")
-    sp.set_defaults(func=cmd_chat)
+    sp = sub.add_parser("config", help="show the effective model config")
+    sp.set_defaults(func=cmd_config)
 
     sp = sub.add_parser("eval", help="run the evaluation harness")
-    sp.add_argument("--benchmark", default="eval/qa_benchmark.json")
-    sp.add_argument("--out", default="results")
+    sp.add_argument("--benchmark",
+                    default=str(PROJECT_ROOT / "eval" / "qa_benchmark.json"))
+    sp.add_argument("--out", default=str(PROJECT_ROOT / "results"))
     sp.add_argument("--top-k", default="1,3,5,10,20")
     sp.add_argument("--answer", type=int, default=0)
     sp.add_argument("--judge", action="store_true")

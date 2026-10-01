@@ -2,13 +2,13 @@
 
 ``RAGPipeline`` wires the chunker, the vector store, a chosen retriever and
 the LLM provider into a single queryable object. It is the component invoked
-by the CLI, the HTTP server, and the evaluation harness.
+by the CLI, the terminal UI, and the evaluation harness.
 """
 
 from __future__ import annotations
 
 import hashlib
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Iterator, List, Optional
 
 from .chunker import Chunker, Chunk
 from .config import Settings
@@ -71,11 +71,65 @@ class RAGPipeline:
         return self.ingest_document(self.loader.load(path))
 
     # ------------------------------------------------------------------- query
-    def query(self, question: str, top_k: Optional[int] = None,
-              doc_type_filter: Optional[str] = None,
-              use_llm: bool = True) -> Dict[str, Any]:
+    def _translate_query(self, question: str) -> str:
+        """Translate a non-English question to English for retrieval.
+
+        The corpus and the embedding model are English; a non-Latin query
+        (e.g. Turkish ``küp atağı``) retrieves almost nothing. When enabled,
+        such questions are translated first. Already-ASCII questions pass
+        through untouched (no extra LLM call).
+        """
+        if not self.settings.translate_queries or question.isascii():
+            return question
+        for _attempt in range(2):  # thinking models can echo the input; retry
+            try:
+                # NB: do NOT force temperature=0.0 here. Thinking-capable
+                # models (e.g. qwen3.5:9b) burn the whole token budget in
+                # their hidden thinking block under greedy decoding and reply
+                # with an empty string, so the original question would be used.
+                translated = self.llm.generate(
+                    "Translate the following user question into English so it "
+                    "can be used to search an English cryptography knowledge "
+                    "base. Reply with ONLY the English translation, no "
+                    "explanations.\n\n"
+                f"Question: {question}",
+                system_prompt="", max_tokens=4096,
+            )
+            except Exception:
+                return question
+            cleaned = (translated or "").strip()
+            if self._acceptable_translation(cleaned, question):
+                return cleaned
+        return question
+
+    @staticmethod
+    def _acceptable_translation(translated: str, question: str) -> bool:
+        """A translation is usable when it is non-empty, actually English
+        (ASCII), and not just an echo of the original question."""
+        if not translated:
+            return False
+        if translated.casefold() == question.casefold():
+            return False
+        return translated.isascii()
+
+    def retrieve(self, question: str, top_k: Optional[int] = None,
+                 doc_type_filter: Optional[str] = None) -> Dict[str, Any]:
+        """Retrieve sources for ``question`` without invoking the LLM."""
         top_k = top_k or self.settings.default_top_k
         results = self.retriever.retrieve(question, top_k=top_k,
+                                          doc_type_filter=doc_type_filter)
+        ctx = assemble_context(results) if results else {"context": "",
+                                                         "sources": []}
+        return {"sources": ctx["sources"], "context": ctx["context"],
+                "retrieved_chunks": results}
+
+    def query(self, question: str, top_k: Optional[int] = None,
+              doc_type_filter: Optional[str] = None,
+              use_llm: bool = True,
+              history: Optional[List[dict]] = None) -> Dict[str, Any]:
+        top_k = top_k or self.settings.default_top_k
+        seek = self._translate_query(question)
+        results = self.retriever.retrieve(seek, top_k=top_k,
                                           doc_type_filter=doc_type_filter)
         ctx = assemble_context(results) if results else {"context": "",
                                                          "sources": []}
@@ -86,15 +140,77 @@ class RAGPipeline:
             return {"answer": None, "sources": ctx["sources"],
                     "retrieved_chunks": results, "context": ctx["context"]}
 
-        user_prompt = build_user_prompt(question, ctx["context"])
-        answer = self.llm.generate(
-            user_prompt,
-            system_prompt=SYSTEM_PROMPT,
-            temperature=self.settings.temperature,
-            max_tokens=self.settings.max_gen_tokens,
-        )
+        user_prompt = build_user_prompt(question, ctx["context"],
+                                        history=history)
+        answer = ""
+        budgets = [self.settings.max_gen_tokens,
+                   max(self.settings.max_gen_tokens * 2, 8192)]
+        for budget in budgets:
+            answer = self.llm.generate(
+                user_prompt,
+                system_prompt=SYSTEM_PROMPT,
+                temperature=self.settings.temperature,
+                max_tokens=budget,
+            ).strip()
+            if answer:
+                break
+        if not answer:
+            answer = ("The model produced no visible answer (it likely spent "
+                      "its token budget on reasoning). Please retry.")
         return {"answer": answer, "sources": ctx["sources"],
                 "retrieved_chunks": results}
+
+    def query_stream(self, question: str, top_k: Optional[int] = None,
+                     doc_type_filter: Optional[str] = None,
+                     history: Optional[List[dict]] = None) -> Iterator[dict]:
+        """Stream a query as a sequence of events.
+
+        Yields dicts of the form:
+
+        * ``{"type": "sources", "sources": [...], "context": "..."}`` first,
+        * ``{"type": "token", "text": "..."}`` for every generated piece, and
+        * ``{"type": "done", "answer": "...", "sources": [...],
+             "retrieved_chunks": [...]}`` last.
+        """
+        top_k = top_k or self.settings.default_top_k
+        seek = self._translate_query(question)
+        results = self.retriever.retrieve(seek, top_k=top_k,
+                                          doc_type_filter=doc_type_filter)
+        ctx = assemble_context(results) if results else {"context": "",
+                                                         "sources": []}
+        yield {"type": "sources", "sources": ctx["sources"],
+               "context": ctx["context"]}
+        if not results:
+            yield {"type": "done", "answer": NO_ANSWER, "sources": [],
+                   "retrieved_chunks": []}
+            return
+
+        user_prompt = build_user_prompt(question, ctx["context"],
+                                        history=history)
+        parts: List[str] = []
+        got_any = False
+        budgets = [self.settings.max_gen_tokens,
+                   max(self.settings.max_gen_tokens * 2, 8192)]
+        for budget in budgets:
+            for piece in self.llm.generate_stream(
+                    user_prompt,
+                    system_prompt=SYSTEM_PROMPT,
+                    temperature=self.settings.temperature,
+                    max_tokens=budget):
+                if piece:
+                    got_any = True
+                    parts.append(piece)
+                    yield {"type": "token", "text": piece}
+            if got_any:
+                break
+
+        answer = "".join(parts).strip()
+        if not answer:
+            answer = ("The model produced no visible answer (it likely spent "
+                      "its token budget on reasoning). Please retry.")
+        yield {"type": "done", "answer": answer,
+               "sources": ctx["sources"], "retrieved_chunks": results,
+               "tokens": getattr(self.llm, "last_tokens", None)}
 
     # ------------------------------------------------------------ summarization
     def summarize_document(self, source: str, max_chunks: int = 15) -> Dict[str, Any]:

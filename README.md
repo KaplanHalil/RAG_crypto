@@ -27,31 +27,39 @@ Generation System for Cryptography and Cryptanalysis"* (see `paper/`).
   BM25 lexical scorer, evaluated against a 49-question QA benchmark.
 - **Evaluation harness** — retrieval metrics (hit@k, MRR@k, nDCG@k),
   LLM-judged answer faithfulness, and citation rate (see `eval/`, `results/`).
-- **Three interfaces** — Python library, CLI, and a FastAPI web server with a
-  single-page English UI.
+- **Two interfaces** — a full-screen terminal chat (TUI) and a Python CLI
+  (`cryptorag`).
 
 ## Terminal UI (TUI)
 
-A full-screen, chat-style terminal interface built with Textual:
+A full-screen, chat-style terminal interface built with Textual — run it with
+plain `cryptorag` (no arguments) or `cryptorag chat`:
 
 ```bash
-python -m crypto_rag.cli chat
+cryptorag           # equivalent to `cryptorag chat`
 ```
 
-- Ask questions and get markdown-rendered answers with inline `[SOURCE n]` citations
-  and a source list (title, file, similarity) under each answer
-- Switch the local Ollama model on the fly (top bar), set Top-K, and filter by
-  document type
-- Slash commands: `/help`, `/stats`, `/clear`, `/ingest-rfc N`,
-  `/ingest-url URL`, `/ingest-file PATH`, `/quit`
-- Shortcuts: `ctrl+q` quit, `ctrl+l` clear the chat; generation runs on a
-  worker thread so the UI stays responsive
+- Ask questions and get **streamed** answers rendered as markdown with inline
+  `[SOURCE n]` citations and a source list (title, file, similarity) under
+  each answer
+- **Multi-turn memory** — follow-up questions refer to the ongoing
+  conversation; `/new` resets it
+- Switch models on the fly (top bar): all models from `cryptorag.json`
+  (Ollama + any OpenAI-compatible provider) plus auto-discovered local Ollama
+  models; set Top-K and filter by document type
+- Answer footer shows model, response time, token count, and sources used
+- Slash commands: `/help`, `/stats`, `/new`, `/clear`, `/save`, `/load`,
+  `/copy`, `/ingest-rfc N`, `/ingest-url URL`, `/ingest-file PATH`, `/quit`
+- Shortcuts: `ctrl+c` / `esc` cancel generation, `ctrl+y` copy last answer,
+  `ctrl+q` quit, `ctrl+l` clear the chat
+- Sessions persist under `data/sessions/` via `/save` and `/load`; generation
+  runs on a worker thread so the UI stays responsive
 
 ## Architecture
 
 ```
                  +--------------------------------------------------+
-  User (web / CLI / library)  --->  RAGPipeline (crypto_rag/pipeline.py)
+  User (TUI / CLI / library)  --->  RAGPipeline (crypto_rag/pipeline.py)
                                    |  chunker | retriever | LLM      |
                  +--------------------------------------------------+
                               |                         |
@@ -66,7 +74,7 @@ python -m crypto_rag.cli chat
 crypto_rag/
   config.py        # pydantic-settings, .env driven
   embeddings.py    # Ollama / OpenAI embedding providers + ChromaDB adapter
-  llm.py           # Ollama / OpenAI generation providers
+  llm.py           # Ollama / OpenAI generation providers (+ streaming)
   chunker.py       # paragraph-aware overlapping chunker
   ingestion.py     # RFC / URL / PDF / TXT loaders + doc-type classification
   vector_store.py  # ChromaDB persistence: upsert / search / stats / delete
@@ -77,8 +85,7 @@ crypto_rag/
   landmark_papers.py  # curated entries for highly-cited papers
   evaluation.py    # benchmarks, metrics, LaTeX tables, plots
   cli.py           # command-line interface
-app.py             # FastAPI server (REST API + web UI)
-templates/index.html  # single-page English web UI
+  tui.py           # interactive terminal chat UI
 eval/qa_benchmark.json # 49-question grounded QA benchmark (gold sources)
 results/           # generated evaluation artifacts
 kripto_makaleler/  # local corpus (PDFs/TXT pulled from IETF & NIST)
@@ -86,61 +93,164 @@ kripto_makaleler/  # local corpus (PDFs/TXT pulled from IETF & NIST)
 
 ## Quick start
 
+`make install` does everything: it creates a virtual environment, installs the
+package (with the `cryptorag` command), prepares `.env`, and links
+`cryptorag` into `~/.local/bin` so you can run it from **any** directory.
+
 ```bash
-# 1. Environment
-python3 -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
+# 1. One-time setup (installs `cryptorag` onto your PATH)
+make install
 
 # 2. Start Ollama and pull models
 ollama serve &
-ollama pull nomic-embed-text
-ollama pull qwen3.5:9b        # or any chat model you have
+make models          # ollama pull nomic-embed-text + qwen3.5:9b
 
 # 3. Build the knowledge base (embeds ~3.6k chunks once)
-python -m crypto_rag.cli index-corpus --reset
+make index           # or: make index-reset to rebuild from scratch
 
-# 4. Ask a question
-python -m crypto_rag.cli query \
+# 4. Ask a question (from anywhere)
+cryptorag query \
   "What is the data complexity of linear cryptanalysis against 16-round DES?"
 
-# 5. Run the web UI at http://localhost:8000
-python -m crypto_rag.cli serve
+# 5. Or just start chatting
+cryptorag
 ```
+
+No virtualenv activation needed — the `cryptorag` command on your PATH handles
+it. Under the hood the same things still work: `python -m crypto_rag.cli ...`
+from the repo directory.
+
+## Make targets
+
+| Target               | What it does                                        |
+| :------------------- | :-------------------------------------------------- |
+| `make install`       | venv + deps + `.env` + link `cryptorag` to `~/.local/bin` |
+| `make models`        | pull the Ollama embedding and chat models           |
+| `make index`         | build the knowledge base                            |
+| `make index-reset`   | rebuild the knowledge base from scratch             |
+| `make query Q="..."` | ask a question                                       |
+| `make chat`          | interactive terminal UI (same as `cryptorag`)          |
+| `make serve`         | HTTP API server (REST + OpenAI-compatible)          |
+| `make stats`         | knowledge-base statistics                           |
+| `make test`          | run the test suite                                  |
+| `make eval`          | run the evaluation harness                          |
+| `make clean`         | remove Python caches                                |
+| `make uninstall`     | remove the `cryptorag` symlink from PATH            |
 
 ## CLI reference
 
+The `cryptorag` command is the same CLI as `python -m crypto_rag.cli`. Bare
+`cryptorag` (no arguments) launches the TUI:
+
 ```
-python -m crypto_rag.cli chat
-python -m crypto_rag.cli stats
-python -m crypto_rag.cli query "question" [--top-k 5] [--model qwen3.5:9b] [--type RFC Document]
-python -m crypto_rag.cli ingest-rfc 9180
-python -m crypto_rag.cli ingest-file paper.pdf
-python -m crypto_rag.cli ingest-url https://...
-python -m crypto_rag.cli summarize "RFC 8446"
-python -m crypto_rag.cli index-corpus --reset
-python -m crypto_rag.cli eval --top-k 1,3,5,10,20 --answer 15 --judge --judge-model gemma4:26b
+cryptorag                  # launch the TUI
+cryptorag stats
+cryptorag query "question" [--top-k 5] [--model qwen3.5:9b] [--type RFC Document]
+cryptorag ingest-rfc 9180
+cryptorag ingest-file paper.pdf
+cryptorag ingest-url https://...
+cryptorag summarize "RFC 8446"
+cryptorag index-corpus --reset
+cryptorag eval --top-k 1,3,5,10,20 --answer 15 --judge --judge-model gemma4:26b
+cryptorag config          # show the effective model config
+cryptorag serve           # HTTP API server (port 8000)
 ```
 
-## REST API
+## Model configuration (opencode-style)
 
-| Method   | Path               | Description                         |
-| :------- | :----------------- | :---------------------------------- |
-| `GET`    | `/api/stats`       | knowledge-base statistics           |
-| `GET`    | `/api/models`      | available Ollama chat models        |
-| `GET`    | `/api/documents`   | list indexed documents              |
-| `DELETE` | `/api/documents`   | delete a document (`?source=...`)   |
-| `POST`   | `/api/ingest/rfc`  | index an IETF RFC                   |
-| `POST`   | `/api/ingest/url`  | index a web page                    |
-| `POST`   | `/api/ingest/file` | upload a PDF/TXT/MD file            |
-| `POST`   | `/api/query`       | RAG question answering              |
-| `POST`   | `/api/summarize`   | summarize an indexed document       |
+CryptoRAG reads an opencode-style JSON config so you can register as many
+providers and models as you like and switch between them from the TUI, the
+CLI (`--model`), or the API — no code changes. Config files are searched like
+opencode:
+
+1. `$CRAG_CONFIG` (explicit override)
+2. `<repo>/cryptorag.json` (project)
+3. `<repo>/.cryptorag.json`
+4. `~/.config/cryptorag/config.json` (global)
+
+A project file is **merged over** the global file. Copy
+[`cryptorag.example.json`](cryptorag.example.json) to one of these locations:
+
+```json
+{
+  "provider": {
+    "ollama": {
+      "type": "ollama",
+      "base_url": "http://localhost:11434",
+      "models": { "qwen3.5:9b": { "name": "Qwen 3.5 9B" } }
+    },
+    "openai": {
+      "type": "openai",
+      "options": { "api_key": "env:OPENAI_API_KEY" },
+      "models": { "gpt-4o-mini": {} }
+    },
+    "groq": {
+      "type": "openai",
+      "base_url": "https://api.groq.com/openai/v1",
+      "options": { "api_key": "env:GROQ_API_KEY" },
+      "models": { "llama-3.3-70b-versatile": {} }
+    }
+  },
+  "embedding": { "provider": "ollama", "model": "nomic-embed-text" },
+  "defaults": { "llm": "qwen3.5:9b" }
+}
+```
+
+- `type` is `ollama` or `openai` (any OpenAI-compatible endpoint: OpenAI,
+  Groq, Together, vLLM, ...all work via a custom `base_url`).
+- API keys use opencode's `env:VAR` syntax and are read from the environment;
+  they are never printed (`cryptorag config` redacts them).
+- Per-model `options` (e.g. `"think": false`) are passed through to the backend.
+- Without any config file, the legacy `.env` (env-driven) behaviour is used
+  unchanged.
+- Ollama models are also auto-discovered locally, so models you `ollama pull`
+  appear in the TUI dropdown even if not listed in the config.
+
+## HTTP API
+
+`cryptorag serve` (or `make serve`) exposes two interfaces on one port
+(default `0.0.0.0:8000`), implemented with the Python standard library only:
+
+```bash
+cryptorag serve --host 127.0.0.1 --port 8000
+```
+
+**REST API** (JSON):
+
+| Method   | Path                  | Description                          |
+| :------- | :-------------------- | :----------------------------------- |
+| `GET`    | `/api/stats`          | knowledge-base statistics            |
+| `GET`    | `/api/models`         | registered chat models + active one  |
+| `GET`    | `/api/config`         | effective config (keys redacted)     |
+| `GET`    | `/api/documents`      | list indexed documents               |
+| `DELETE` | `/api/documents`      | delete a document (`?source=...`)    |
+| `POST`   | `/api/query`          | RAG question answering               |
+| `POST`   | `/api/query/stream`   | RAG answering as server-sent events  |
+| `POST`   | `/api/ingest/rfc`     | index an IETF RFC (`{"rfc_number":N}`) |
+| `POST`   | `/api/ingest/url`     | index a web page (`{"url":...}`)     |
+| `POST`   | `/api/ingest/file`    | upload raw body (`?name=paper.pdf`)  |
+| `POST`   | `/api/summarize`      | summarize an indexed document        |
+
+**OpenAI-compatible** — any tool (opencode, curl, your own apps) can use
+CryptoRAG as a chat model:
+
+```bash
+curl -s http://localhost:8000/v1/chat/completions \
+  -H 'Content-Type: application/json' \
+  -d '{"model":"qwen3.5:9b",
+       "messages":[{"role":"user","content":"küp atağı nedir?"}]}'
+```
+
+- `GET /v1/models` lists registered models; `POST /v1/chat/completions`
+  accepts `messages`, `model`, and `stream` (SSE chunks).
+- Prior `user`/`assistant` messages become the conversation history, and the
+  retrieved sources are returned under the `crypto_rag.sources` field.
 
 ## Evaluation
 
 ```bash
-python -m crypto_rag.cli eval --top-k 1,3,5,10,20              # retrieval metrics
-python -m crypto_rag.cli eval --answer 15 --judge --judge-model gemma4:26b
+cryptorag eval --top-k 1,3,5,10,20              # retrieval metrics
+cryptorag eval --answer 15 --judge --judge-model gemma4:26b
 ```
 
 Outputs land in `results/`: per-retriever JSON, a summary, LaTeX-ready tables
@@ -164,8 +274,13 @@ Answer quality (15 generated answers, `qwen3.5:9b`; judged by `gemma4:26b`):
 All knobs live in environment variables (prefix `CRAG_`). Switch backends with:
 
 ```bash
-CRAG_LLM_BACKEND=openai CRAG_OPENAI_API_KEY=sk-... python -m crypto_rag.cli serve
+CRAG_LLM_BACKEND=openai CRAG_OPENAI_API_KEY=sk-... cryptorag
 ```
+
+**Asking in other languages:** the corpus is English. If you type a question
+with non-ASCII characters (e.g. Turkish *"küp atağı anlat"*), CryptoRAG
+automatically translates it to English for retrieval (`CRAG_TRANSLATE_QUERIES=true`)
+and still answers in your language, grounded in the English sources.
 
 ## Paper
 

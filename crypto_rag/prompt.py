@@ -75,8 +75,36 @@ def assemble_context(search_results: List[Dict[str, Any]],
     return {"context": "\n\n".join(context_parts), "sources": sources}
 
 
-def build_user_prompt(question: str, context: str) -> str:
-    return USER_PROMPT_TEMPLATE.format(question=question, context=context)
+def build_user_prompt(question: str, context: str,
+                      history: Optional[List[Dict[str, str]]] = None) -> str:
+    """Assemble the user prompt.
+
+    ``history`` is an optional list of prior turns (oldest first), each a dict
+    with ``role`` ("user"|"assistant") and ``content``. When given, a bounded
+    recent window is included so the model can answer follow-up questions in
+    context. It must NOT contain the current question.
+    """
+    if not history:
+        return USER_PROMPT_TEMPLATE.format(question=question, context=context)
+
+    turns = []
+    for turn in history[-8:]:
+        label = "Question" if turn.get("role") == "user" else "Previous answer"
+        turns.append(f"{label}: {turn.get('content', '')}")
+    transcript = "\n\n".join(turns)
+
+    return (
+        "CONVERSATION SO FAR:\n"
+        f"{transcript}\n\n"
+        f"Current question: {question}\n\n"
+        "RETRIEVED KNOWLEDGE CONTEXT:\n"
+        f"{context}\n\n"
+        "Instructions: Using the sources above, answer the current question "
+        "with technical precision. Attach the corresponding inline citation "
+        "[SOURCE n: title] after each important piece of information. You "
+        "may refer to the conversation above when the current question "
+        "builds on it, but stay grounded in the retrieved context."
+    )
 
 
 def build_summary_system_prompt() -> str:

@@ -17,8 +17,8 @@ from typing import Optional
 from .config import get_settings
 from .embeddings import build_embedding_provider
 from .ingestion import DocumentLoader
-from .landmark_papers import LANDMARK_PAPERS
-from .pipeline import RAGPipeline, chunk_id
+from .landmark_papers import LANDMARK_PAPERS, SUBSTITUTE_PAPERS
+from .pipeline import chunk_id
 from .vector_store import VectorStore
 
 
@@ -76,6 +76,16 @@ def index_corpus(reset: bool = True, papers_dir: Optional[str] = None,
         total_chunks += len(chunks)
         total_docs += 1
         print(f"[indexer] + landmark: {doc.title} ({len(chunks)} chunks)")
+
+    print(f"[indexer] indexing {len(SUBSTITUTE_PAPERS)} curated substitutes")
+    for entry in SUBSTITUTE_PAPERS:
+        doc = entry["document"]
+        chunks = chunker.chunk(doc.content, doc.metadata())
+        ids = [chunk_id(doc, c) for c in chunks]
+        store.add_chunks(ids, [c.text for c in chunks], [c.metadata for c in chunks])
+        total_chunks += len(chunks)
+        total_docs += 1
+        print(f"[indexer] + substitute: {doc.source} ({len(chunks)} chunks)")
 
     print(f"[indexer] done: {total_docs} documents, {total_chunks} chunks")
     print(f"[indexer] stats: {store.get_stats()}")

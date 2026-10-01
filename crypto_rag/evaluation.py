@@ -21,7 +21,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-from .config import Settings, get_settings
+from .config import PROJECT_ROOT, Settings, get_settings
 from .embeddings import build_embedding_provider
 from .llm import build_llm_provider
 from .pipeline import RAGPipeline
@@ -248,8 +248,9 @@ def plot_curves(retriever_metrics: Dict[str, Dict[int, Dict[str, float]]],
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="CryptoRAG evaluation harness")
-    ap.add_argument("--benchmark", default="eval/qa_benchmark.json")
-    ap.add_argument("--out", default="results")
+    ap.add_argument("--benchmark",
+                    default=str(PROJECT_ROOT / "eval" / "qa_benchmark.json"))
+    ap.add_argument("--out", default=str(PROJECT_ROOT / "results"))
     ap.add_argument("--top-k", default="1,3,5,10,20")
     ap.add_argument("--answer", type=int, default=0,
                     help="generate answers for the first N questions (0=off)")

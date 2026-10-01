@@ -1,0 +1,735 @@
+The boomerang atta k
+David Wagner
+U.C. Berkeley
+
+daw s.berkeley.edu
+
+This paper des ribes a new di erential-style atta k, whi h
+we all the boomerang atta k. This atta k has several interesting appli ations. First, we disprove the oft-repeated laim that eliminating all
+high-probability di erentials for the whole ipher is suÆ ient to guarantee se urity against di erential atta ks. Se ond, we show how to break
+COCONUT98, a ipher designed using de orrelation te hniques to ensure provable se urity against di erential atta ks, with an advan ed
+di erential-style atta k that needs just 216 adaptively hosen texts. Also,
+to illustrate the power of boomerang te hniques, we give new atta ks on
+Khufu-16, FEAL-6, and 16 rounds of CAST-256.
+Abstra t.
+
+1 Introdu tion
+One of the most powerful ryptanalyti te hniques known in the open literature
+is di erential ryptanalysis [BS93℄. Di erential analysis has been used to break
+many published iphers. It is understandable, then, that blo k ipher designers
+are typi ally quite anxious to ensure se urity against di erential style atta ks.
+The usual design pro edure goes something like this. The algorithm designer
+obtains somehow an upper bound p on the probability of any di erential hara teristi for the ipher. Then the designer invokes an oft-repeated \folk theorem"
+to justify that any su essful di erential atta k will require at least 1=p texts to
+break the ipher, whi h is supposed to allow us to on lude that the ipher is
+safe from di erential atta ks.
+Unfortunately, this folk theorem is wrong. We exhibit an atta k|whi h we
+all the boomerang atta k|that an allow an adversary to beat the 1=p bound in
+some ases1 . In parti ular, if the best hara teristi for half of the rounds of the
+ipher has probability q , then the boomerang atta k an be used in a su essful
+atta k needing O(q 4 ) hosen texts. In some ases, we may have q 4  p 1 , in
+whi h ase the boomerang atta k allows one to beat the folk theorem's bound.
+Also, boomerang atta ks sometimes allow for a more extensive use of stru tures
+than is available in onventional di erential atta ks, whi h makes boomerang
+te hniques more e e tive than the pre eding dis ussion might suggest.
+1
+
+Note that Biham et al.'s impossible di erentials [BBS98,BBS99℄ also disprove the folk
+theorem. They show that if one an nd a di erential of suÆ iently low probability,
+the ipher an be broken. However, the boomerang atta k in fa t lets us make an
+sharper statement: even if no di erential for the whole ipher has probability that is
+too high or too low, the ipher might still be vulnerable to di erential-style atta ks.
+
+Cipher
+
+(Rounds)
+
+COCONUT98
+Khufu
+CAST-256
+FEAL
+
+(8)
+(16)
+(16)
+(6)
+
+Our Atta k
+Data Complexity Time Complexity
+216 CP
+238
+218 CP
+218
+49:3
+2
+KP
+249:3
+4 CP
+-
+
+KP | known-plaintext, CP | adaptive hosen-plaintext/ iphertext.
+Table 1.
+
+Summary of our atta ks.
+
+We give a surprisingly sharp example of this possibility in Se tions 3{5 below,
+where we show how to break COCONUT98 [V98℄ with just 216 hosen texts and
+238 work, despite a proof that the best hara teristi for the whole ipher must
+have probability p  2 64 . Our atta k makes ru ial use of a hara teristi for
+half of the ipher with probability q  2 4 . This shows that the folk theorem
+an fail spe ta ularly, even for real-world iphers.
+We also extend the boomerang atta k to use te hniques from trun ated differential analysis (see Se tion 6). As a result, we are able to analyze iphers
+whi h admit good trun ated di erentials. In Se tion 7 we show how to break
+16 rounds of Khufu with 218 adaptive hosen plaintexts and iphertexts and
+very little work. We also onsider CAST-256 in Se tion 9, where we show how
+to break 16 rounds with 249:3 known texts2 . Se tion 9 also brie y sket hes the
+inside-out atta k, a dual to the boomerang atta k. Finally, Se tion 10 dis usses
+some related work, and Se tion 11 on ludes the paper. See Table 1 for our table
+of results.
+
+2 The boomerang atta k: a generi view
+The boomerang atta k is a di erential atta k that attempts to generate a quartet
+stru ture at an intermediate value halfway through the ipher.
+The atta k onsiders four plaintexts P; P 0 ; Q; Q0 , along with their respe tive
+iphertexts C; C 0 ; D; D0 ; we will defer des ribing how these are generated until
+later. Let E () represent the en ryption operation, and de ompose the ipher into
+E = E1 Æ E0 , where E0 represents the rst half of the ipher and E1 represents
+the last half. We will use a di erential hara teristi , all it  !  , for E0 , as
+well as a hara teristi r ! r for E1 1 .
+We want to over the pair P; P 0 with the hara teristi for E0 , and to over
+the pairs P; Q and P 0 ; Q0 with the hara teristi for E1 1 . Then (we laim) the
+pair Q; Q0 is perfe tly set up to use the hara teristi  !  for E0 1 .
+2
+
+See also Appendix B, where we show that CAST-256 would be mu h weaker if
+the round ordering was reversed: in parti ular, boomerang atta ks would be able to
+break 24 rounds of this variant with 248:5 hosen texts. Please note that this 24-round
+boomerang atta k does not apply to the real CAST-256 AES proposal.
+
+Let's examine why this is so. Consider the intermediate value after half of
+the rounds. When the previous three hara teristi s hold, we have
+
+E0 (Q)  E0 (Q0 ) = E0 (P )  E0 (P 0 )  E0 (P )  E0 (Q)  E0 (P 0 )  E0 (Q0 )
+= E0 (P )  E0 (P 0 )  E1 1 (C )  E1 1 (D)  E1 1 (C 0 )  E1 1 (D0 )
+=   r  r =  ;
+Note that this is exa tly the ondition required to start the hara teristi  !
+ for the inverse of the rst half of the ipher. When this hara teristi also
+holds, we will have the same di eren e in the plaintexts Q; Q0 as found in the
+original plaintexts P; P 0 . This is why we all it the boomerang atta k: when you
+
+send it properly, it always omes ba k to you.
+
+Q0
+
+Q
+
+
+P
+
+P0
+
+
+E0
+
+E0
+
+E0
+
+E0
+
+
+r
+E1
+
+
+
+r
+
+E1
+E1
+
+r
+
+Fig. 1.
+
+r
+D0
+
+D
+C
+
+E1
+
+C0
+
+A s hemati of the basi boomerang atta k.
+
+We de ne a right quartet as one where all four hara teristi s hold simultaneously. The only remaining issue is how to hoose the texts so they have the
+right di eren es. We suggest generating P 0 = P  , and getting the en ryptions C; C 0 of P; P 0 with two hosen-plaintext queries. Then we generate D; D0 as
+D = C  r and D0 = C 0  r. Finally we de rypt D; D0 to obtain the plaintexts
+Q; Q0 with two adaptive hosen- iphertext queries. See Figure 1 for a pi torial
+depi tion of the basi boomerang atta k.
+
+In the remainder of the paper, we onsider several on rete atta ks using the
+boomerang atta k.
+
+3 The COCONUT98 algorithm
+The COCONUT98 ipher [V98℄ may be of spe ial interest to some readers beause of its relian e on the re ently-developed theory of de orrelation te hniques
+for blo k ipher design [V97,V98,V98b,GG+98℄. Using de orrelation te hniques,
+[V98℄ proves that the full COCONUT98 ipher admits no good di erential hara teristi s. Despite this fa t, we observe that there are di erential hara teristi s
+of very high probability for half of the ipher, and we make extensive use of these
+hara teristi s in our atta k. This suggests that the de orrelation design te hnique may fail to provide se urity against advan ed di erential atta ks in some
+ases if extra are is not taken. This is not to suggest that the de orrelation approa h is fundamentally awed|indeed, de orrelation theory seems like a very
+useful tool for the ipher designer|but rather that the theoreti al results must
+be interpreted with aution.
+We brie y re ount the des ription of the COCONUT98 algorithm. COCONUT98 uses a 256-bit key K = (K1 ; : : : ; K8 ). The key s hedule generates
+eight round subkeys k1 ; : : : ; k8 as
+
+i
+ki
+i
+ki
+
+1
+
+2
+
+3
+
+4
+
+K1
+
+K1  K3
+
+K1  K3  K4
+
+K1  K4
+
+5
+
+6
+
+7
+
+8
+
+K2
+
+K2  K3
+
+K2  K3  K4
+
+K2  K4
+
+The last four key words are used to build a de orrelation module
+
+M (xy) = (xy  K5K6 )  K7 K8 mod GF(264 )
+where on atenation of symbols (e.g. xy ) represents the on atenation of their
+values as bitstrings.
+Next, we build a Feistel network as follows. Let
+
+(x) = x + 256  S (x mod 256) mod 232
+Fi ((x; y)) = (y; x  (ROL11 ((y  ki )) + mod 232 ))
+i = F4i+4 Æ F4i+3 Æ F4i+2 Æ F4i+1
+where ROL11 () represents a left rotation by 11 bits, is a publi 32-bit onstant,
+and S : Z82 ! Z24
+2 is a xed S-box.
+With this notation, COCONUT98 is de ned as 1 Æ M Æ 0 . In other words,
+COCONUT98 onsists of four Feistel rounds with subkeys k1 ; : : : ; k4 , followed
+by an evaluation of the de orrelation module M , and nally four more Feistel
+rounds with subkeys k5 ; : : : ; k8 .
+
+4 Di erential hara teristi s for COCONUT98
+This se tion dis usses the di erential hara teristi s of COCONUT98. In the
+following dis ussion, let ej = 2j be the 32-bit xor di eren e with just the j -th
+bit ipped. (Subs ripts are taken modulo 32, for onvenien e in modeling the
+ROL(; 11) operation.)
+We note that the Feistel rounds of COCONUT98 admit very good di erential
+hara teristi s. The main observation is that ej ! ej +11 by the Feistel fun tion
+with probability 1=2 when j 2 J = f8; 9; : : : ; 19; 20; 29; 30; 31g.3 Similarly, ej 
+ek ! ej+11  ek+11 with probability 1=4 when j; k 2 J (j 6= k).
+Using this idea, we an build many good hara teristi s for four rounds of
+COCONUT98. For example, the hara teristi
+(e19 ; e18  e8 ) ! (e18  e8 ; e29 ) ! (e29 ; e18 ) ! (e18 ; 0) ! (0; e18 )
+
+for has probability 0:83  2 4  2 4:3 . Of ourse, by symmetry we also get orresponding ba kwards hara teristi s for de ryption through four Feistel rounds.
+This suggests that we ought to try to nd some way to take advantage of these
+high-probability hara teristi s for the half- ipher in our analysis. However, the
+task is not so easy as it might rst look. If we try to mount a traditional di erential atta k on the whole ipher, the de orrelation module M will immediately
+ause serious diÆ ulties. When the key words K7 ; K8 are unknown, it is very
+diÆ ult to push any di erential hara teristi through M . More pre isely, every
+di erential Æ ! Æ  for M with Æ; Æ  6= 0 has average probability 1=(264 1), where
+the probability is averaged over all possible key values. In short, the de orrelation
+module prevents us from pushing a di erential hara teristi past M .
+This is where the boomerang atta k omes in handy: the boomerang quartet
+property allows us to ontrol the e e t of the de orrelation module in the middle.
+The ru ial idea whi h lets the atta k work is that M is aÆne, and thus for
+any xed key there are ex ellent hara teristi s r ! M 1 (r ) of probability 1
+for M 1 . Take E0 = 0 and E1 = 1 ÆM . Then if r ! r is a good hara teristi
+for 1 1 we will obtain a good hara teristi r ! M 1 (r ) for E1 1 . It does not
+matter that M 1 (r) is unknown to the atta ker; the ru ial property is that it
+depends only on the key (and not on the values of the iphertexts).
+Let us estimate the su ess probability for this te hnique. We need two hara teristi s for 0 , and two for 1 1 , to hold. Thus, a simple estimate at the
+probability p of su ess is
+3
+
+p  Pr[ !  by 0 ℄2 Pr[r ! r by 1 1 ℄2
+
+At rst glan e, it might appear that the probability is 1=8, be ause there are three
+additions in the F fun tion and thus three arry bits to ontrol. However, the three
+arries are not independent, and in fa t we an handle three arries as easily as
+one by noting that x 7! (x + a mod 232 ) + b mod 232 (two arries) is equivalent to
+x 7! x + mod 232 (one arry) where = a + b.
+The rotate does not destroy this property, so long as we avoid the most signi ant
+bits, whi h explains our hoi e of J . Empiri ally, the probabilities are 0:47; 0:44; 0:38
+for j = 18; 19; 20 and 0:47; 0:44 for j = 29; 30. For other values of j , the probability
+is very lose to 1=2.
+
+where ;  ; r; r may be hosen arbitrarily by the atta ker to maximize p.
+It turns out that this estimate an be re ned a bit. We note that the same
+atta k works even if we do not predi t the exa t value of r ahead of time, but
+instead merely require that the di eren e after de rypting by 1 is the same in
+the two pairs P; Q and P 0 ; Q0 . A similar observation also holds for  . Therefore,
+we may sum over all values for  ; r , to obtain
+
+p
+
+X  ! 
+
+
+
+
+Pr[
+
+by 0 ℄2 
+
+X r ! r
+r
+
+
+
+Pr[
+
+by 1 1 ℄2 :
+
+For COCONUT98, this an be used to signi antly in rease the probability of
+atta k. Empiri ally, we nd that  = r = (e10 ; e31 ) provides p  0:023  0:023 
+1=1900.
+
+5 The basi boomerang atta k on COCONUT98
+Next we show how to use the quartet property established above to mount a
+pra ti al atta k on COCONUT98. We use a 1-R atta k, so the riterion for
+su ess is that Q  Q0 = (?; e31 ) where ? represents an arbitrary word. This
+improves the su ess probability p by a fa tor of two, to 1=950.
+It is immediately lear from this dis ussion that COCONUT98 an be easily
+distinguished from an ideal ipher with at most about 950  4 = 3800 adaptive
+hosen plaintext/ iphertext queries. However, we aim for more: a key-re overy
+atta k.
+The key-re overy atta k pro eeds along relatively standard lines. In about
+16  950 trials requiring 16  950  4 adaptive hosen plaintext/ iphertext queries,
+we generate about 16 useful quartets. Note that the signal-to-noise is extremely
+high, so we should be able to lter out all wrong quartets very e e tively.
+First, we re over K1 . We guess K1 , and peel o the rst round. We use
+the fa t that if P; P 0 ; Q; Q0 form a quartet with the property above, then the
+xor di eren e after one round of en ryption must be (e31 ; 0) for both the P; P 0
+pair and the Q; Q0 pair. This ondition holds for 1/2 of the wrong key values.
+Therefore ea h quartet gives one bit of information on K1 from the P; P 0 pair
+and another bit of information from the Q; Q0 pair. With 16 useful quartets, we
+expe t K1 to be identi ed uniquely.
+Next, we re over K2  K4 by de rypting up one round and examining the xor
+di eren e in the C; D pair and in the C 0 ; D0 pair. The details are very similar to
+those used to learn K1 .
+This allows us to peel o the rst and last rounds of the ipher. Then we
+repeat the atta k on the redu ed ipher. For instan e, we an use about 8  144  4
+more adaptive hosen plaintext/ iphertext queries to generate about 8 useful
+quartets for the redu ed ipher if we use the same settings for ; r, sin e then
+the su ess probability p in reases to about 1=144. Using these 8 useful quartets
+for the redu ed ipher we learn K3 ; and we repeat the atta k iteratively until
+the entire key is known.
+
+In all, the omplexity of the atta k is about 16  950  4 + 8  144  4 + : : :  216
+adaptive hosen plaintext/ iphertext queries. The atta k requires 8  2  32  232 =
+241 oine omputations of the F fun tion, whi h is work omparable to that
+required for 238 trial en ryptions. The atta k an also be onverted to a knownplaintext atta k, but then the omplexity in reases dramati ally to 252 texts.
+The best onventional atta k on COCONUT98 we ould nd was a meetin-the-middle atta k that exploits a weakness in the key s hedule. However, the
+meet-in-the-middle atta k requires approximately 296 trial en ryptions, so our
+hosen-text boomerang atta k ompares very favorably to it. See Appendix A
+for more details on the meet-in-the-middle atta k.
+Fixing the ipher would require areful hanges to its internal design. One
+possible approa h would be to repla e the four-round Feistel network by a
+transformation with mu h more strength against di erential ryptanalysis (say,
+16 rounds instead of 4). Another possible approa h is to use a de orrelation
+module in ea h round; this seems likely to prevent boomerang-style atta ks, and
+is in fa t the approa h proposed in the DFC AES submission [GG+98℄. (Using
+just a de orrelation module before the rst round and after the last round is not
+enough|di erential-style atta ks are still possible.)
+It is lear that the mere use of de orrelation te hniques is not enough to
+guarantee se urity against di erential-style atta ks. At the same time, although
+it does not provide the onje tured 264 se urity level, COCONUT98's de orrelation module does seem to improve the ipher's se urity. Without a de orrelation
+module, COCONUT98 would be vulnerable to onventional di erential atta ks
+requiring on the order of 28 hosen texts, so in this ase the de orrelation module
+seems to have approximately squared the se urity level of the base ipher.
+
+6 Extensions to trun ated di erential analysis
+So far we have on ned the dis ussion to onventional di erential hara teristi s,
+but it seems natural to wonder whether boomerang atta ks an also be made
+to work using trun ated di erentials. The answer is yes, but there are some
+diÆ ulties.
+The pitfall with extensions to trun ated di erentials is that
+Pr[ !  by F ℄ = Pr[ !  by F 1 ℄
+
+always holds for onventional di erential hara teristi s, but an fail to hold
+for trun ated hara teristi s. Note that our analysis in earlier se tions assumed
+that if  !  by the rst half of the ipher, then  !  holds with the
+same probability for the inverse of the rst half of the ipher. For trun ated
+di erentials, this assumption in general is not orre t.
+A more a urate formula for the su ess probability p of a boomerang atta k
+with trun ated di erentials is
+
+p
+
+X
+
+wxyz=0
+
+Pr[ ! w by E0 ℄  Pr[r ! x by E1 1 ℄ 
+
+Pr[r ! y by E1 1 ℄  Pr[z !  by E0 1 ℄:
+
+This formula is rather unwieldy, but fortunately it an often be simpli ed substantially to
+
+p  Pr[ !  ℄  Pr[r ! r ℄2  Pr[ ! ℄ 
+Pr[w  x  y 2  j w 2  ; x; y 2 r ℄:
+If the trun ated di erentials  ; r are linear (i.e. losed under ), as is usually
+
+the ase, the last term in the formula above is easily omputed.
+
+7 Khufu
+We des ribe a boomerang atta k that breaks 16 rounds of Khufu [Mer90℄ with
+218 adaptively hosen plaintext/ iphertext queries and a omparable workfa tor. This is an improvement over the best previous result, a di erential atta k
+on Khufu-16 needing 231 {243 hosen texts (depending on whether one wants a
+distinguishing or key-re overy atta k) [GC94℄.
+In our boomerang atta k, we exploit that there are ex ellent trun ated differentials available for both halves of the ipher. For the rst half of the ipher,
+we use
+ = (0; 0; 0; a; b; ; d; e) ! (0; 0; 0; a; 0; 0; 0; 0) =  ;
+
+whi h holds with probability 2 32 in the forward dire tion and probability
+1 in the reverse dire tion. We will hold a xed throughout the atta k. For
+the inverse of the last half of the ipher, we use r = (0; 0; 0; a; 0; 0; 0; 0) !
+(0; 0; 0; a; f; g; h; i) = r , whi h holds with probability 1. Also, due to a areful
+hoi e of r ;  , we have Pr[w  x  y 2  j w 2  ; x; y 2 r ℄ = 1. Thus 2 32
+of the quartets hosen a ording to these di eren es will form right quartets.
+One an use stru tures to redu e the number of texts needed. Choose a pool
+of 216 plaintexts (L; Ri ) with L held xed and Ri varying. Also, form another
+pool of 216 plaintexts as (L0 ; Rj0 ) where L0 = L  (0; 0; 0; a) and Rj0 varies. For
+ea h iphertext C obtained by en rypting one of these 217 plaintexts, we de rypt
+D = C r to get the plaintext Q. We look for Q; Q0 with a di eren e of (0; 0; 0; a)
+in the left half of the blo k; su h a pair probably indi ates a right quartet. This
+hoi e of stru tures is expe ted to provide about one right quartet, although one
+wrong quartet will probably also survive the initial ltering phase.
+On e we have a (suggested) right quartet formed by (L; Ri ) and (L0 ; Rj0 ),
+we an use it to obtain more right quartets at little ost. We form another
+210 quartets by hoosing P = (L  ( ; ; 0; 0); Ri ), P 0 = (L0  ( ; ; 0; 0); Rj0 )
+where ; take on 210 possible values; C; C 0 ; D; D0 ; Q; Q0 are generated from
+P; P 0 as before. Now ea h su h quartet is guaranteed to be a right quartet (if
+(L; Ri ); (L0 ; Rj0 ) formed a right quartet) be ause we have su essfully bypassed
+the rst round. Thus, any wrong quartets whi h survived the earlier ltering
+phase are easily eliminated. Furthermore, given 210 right quartets we expe t to
+be able to form 210 equations of the form S1 (x)  S1 (y ) = z for known values
+of x; y; z , and this should be suÆ ient to re over S1 up to a xor by a 32-bit
+onstant. Then the 8-round redu ed ipher an be broken trivially.
+
+In total, this atta k on Khufu-16 requires 218 + 4  210  218 adaptively
+hosen texts. The workfa tor is minimal.
+
+8 FEAL
+One an also apply boomerang te hniques to FEAL. There are 3-round di erential hara teristi s with probability one [BS93℄, so we immediately obtain an
+eÆ ient boomerang atta k that distinguishes FEAL-6 from a random permutation with only four adaptive hosen plaintext/ iphertext queries. (This elegant
+observation is due to Eli Biham [Bih99℄.)
+
+9 Inside-out atta ks
+In this se tion, we sket h a des ription of the \inside-out atta k," whi h may be
+viewed as a dual to the boomerang atta k. The di eren e is that the boomerang
+atta k works from the outside in while the inside-out atta k works from the
+inside out.
+In the inside-out atta k, we sear h for pairs of texts whi h ontain a desired
+di eren e  at the intermediate value after half the rounds. We hope that the
+di erential  ! 0 for E1 and the di erential  !  for E0 1 both hold.
+In this ase, we will have re ognizable di eren es  and 0 in the plaintexts
+and iphertexts of the pair. If we a umulate enough pairs with the di eren e
+ halfway through the ipher, we should be able to nd at least one right pair
+where both di erentials hold.
+To illustrate these ideas in a tion, we analyze 16 rounds of CAST-256. CAST256 [Ada98℄ is a generalized Feistel blo k ipher, whose simpli ity makes it a ni e
+test-bed to explore the properties of generalized Feistel round stru tures.
+We brie y re all the de nition of CAST-256 here. The 128-bit blo k is divided
+into four 32-bit words, and a Feistel fun tion F : Z32
+2 ! Z32
+2 is used to update
+the blo k. There are two types of rounds, whi h we shall all \A rounds" and \B
+rounds" in a hoi e of terminology inspired by Skipja k. An A round en rypts
+the input blo k (w; x; y; z ) to (z; w; x; y  F (z )), and a B round en rypts to
+(x; y; z  F (w); w). Note that A  B 1 ; by this we mean that the stru ture of
+the inverse of a B round is the same as the stru ture of an A round, not that
+they are true fun tional inverses. With this terminology, the CAST-256 ipher
+stru ture is de ned as B 24 Æ A24 , i.e. 24 A rounds followed by 24 B rounds.
+The CAST-256 stru ture admits many ni e trun ated di erentials. In our
+boomerang atta k, we will use  = (0; 0; 0; a) ! (0; b; ; a) = 0 , whi h holds
+with probability 1 for 8 B rounds, and  = (0; 0; 0; a) ! (0; d; e; a), whi h holds
+with probability 1 for de rypting though 8 A rounds.
+The signal-to-noise ratio of the inside-out atta k will be reasonably good,
+be ause right pairs an be re ognized by a 96-bit ltering ondition.
+To implement the atta k, we olle t 249:3 known texts en rypted under 16
+rounds of CAST-256. By the birthday paradox, we expe t to see three right pairs
+
+among those texts, whi h an be readily re ognized. (We also expe t to get three
+wrong pairs, but they should be eliminated in the next phase.) Then we sear h
+over the last round subkey. Ea h guess at the 37 key bits entering the last round
+suggests 25 possible values for the 37 key bits entering the next-to-last round;
+the three right pairs allow us to uniquely re ognize the orre t values for the last
+two round subkeys. The rst two round subkeys an be re overed by analogous
+te hniques. Finally, the atta k may be repeated on the redu ed-round ipher.
+To sum up, we see how to break 16 rounds of CAST-256 with an inside-out
+atta k that needs just 249:3 known texts and very little work. This atta k is
+independent of the de nition of F fun tion or key s hedule, and depends only
+on the round stru ture.
+There are two impli ations of our analysis. First, it indi ates that CAST-256
+redu ed to 16 rounds would not be adequately se ure. Sin e CAST-256 with 48
+rounds is 2{2.5 times slower on high-end CPUs than the fastest AES andidates
+[SK+98℄, this suggests that CAST-256's se urity-to-performan e ratio may not
+be as high as some other ontenders. On the other hand, se urity learly must
+take pre eden e over performan e, and here our analysis provides some support
+for the CAST-256 design. We have seen that CAST-256's round ordering is
+ideally-suited to resist boomerang atta ks (see Appendix B), and due to the
+sheer number of rounds, it seems very hard to extend our inside-out atta k to
+the full ipher.
+
+10 Related work
+The boomerang atta k is losely related to many other ideas that have previously o urred in the literature. As a result, there are many di erent ways to
+think about the boomerang atta k. In this se tion, we will try to survey the
+possibilities.
+The boomerang atta k is related to the di erential-linear atta k of [HL94℄. In
+a di erential-linear atta k, one overs E0 with a trun ated di erential  !  ,
+overs E1 1 with a linear approximation !  , and nally overs E1 with
+a se ond approximation  ! ; there is also the additional requirement that
+  x be onstant for all x 2  . From this perspe tive, one ould think of the
+boomerang atta k as a \di erential-di erential" atta k (if the reader will indulge
+a slight abuse of terminology).
+A similar observation is that the boomerang atta k is losely related to
+higher-order di erential te hniques [Lai94,Knu95℄. As noted in Se tion 6, the
+pairs P; Q, P 0 ; Q0 don't a tually need to follow r ! r : it is suÆ ient that
+E1 1 (P )  E1 1 (P 0 )  E1 1 (Q)  E1 1 (Q0 ) = 0, and this may be viewed (in a very
+approximate sense) as a higher-order di erential of order two. In this way, the
+boomerang atta k an be onsidered as an intermediate step between onventional di erential and higher-order di erential atta ks.
+Another pre ursor of the boomerang atta k is the \double-swiping" atta k
+[KSW97℄, a di erential related-key atta k on NewDES-1996 that an, in retrospe t, be viewed as a boomerang-style atta k (with minor adjustments to
+
+take advantages of related-key queries, as allowed in [KSW97℄'s extended threat
+model).
+One of the interesting features of the boomerang atta k is that it is apparently
+very well-suited to the analysis of iphers that use asymmetri round fun tions4 .
+Asymmetri round fun tions an be lassi ed into one of two types: the A round,
+whi h has better di usion in the forward dire tion than in the reverse dire tion,
+and the B round, whi h has better di usion in the reverse dire tion. We note
+that when the rst half of the ipher is built of B-type rounds and the last half
+is built of A-type rounds, boomerang atta ks seem to be espe ially dangerous
+be ause they allow one to probe from both endpoints at the same time.
+This supplies some intuition for how the boomerang atta k works. It would
+not be unreasonable to think of the boomerang atta k as a di erential meetin-the-middle atta k that uses di erentials to work from the outside in; the
+interesting bit is what happens where the di erentials \meet" in the middle of
+the ipher.
+One disadvantage of the boomerang atta k is that it inherently requires
+the ability to perform both adaptive hosen-plaintext and adaptive hoseniphertext queries at on e, a rare requirement to nd in a pra ti al atta k. We
+are aware of only two other atta ks with this property: (1) the adaptive hosenplaintext/ iphertext atta k on the 3-round Luby-Ra ko ipher, whi h is also
+used to good e e t in some of Knudsen's work [Knu98℄ on Luby-Ra ko iphers
+with more rounds, and (2) Biham et. al's yo-yo game [BB+98℄, whi h is losely
+related to their more-famous miss-in-the-middle atta k [BBS98,BBS99℄.
+The relation between the boomerang atta k and the miss-in-the-middle atta k is a lose and interesting one. It seems that the boomerang atta k is little
+more than a hosen-plaintext/ iphertext version of the miss-in-the-middle atta k. In parti ular, if Pr[ !  ℄ = Pr[r ! r ℄ = 1 and  \ r = ;, then
+the same pair of di erentials an be used to obtain either a miss-in-the-middle
+atta k (using the impossible di erential  ! r) or a boomerang atta k.
+This paper showed that in some spe ial ases the boomerang atta k an improve on the miss-in-the-middle atta k, if adaptive hosen plaintext/ iphertext
+queries are available. However, this seems to be the ex eption rather than the
+rule. For several iphers|in luding Skipja k and CAST-256|miss-in-the-middle
+atta ks penetrate through more rounds than boomerang atta ks [BBS98,BBS99℄.
+Though a thorough omparison of the two types of atta ks ontinues to elude
+us, we hope that this work will stimulate further resear h into the intera tion
+between these two atta ks.
+
+11 Con lusions
+We have des ribed a new way to use di erential-style te hniques for ryptanalysis
+of blo k iphers. Our atta ks an break some iphers that are immune to ordinary
+di erential ryptanalysis, and an provide a powerful new way to analyze iphers
+4
+
+See Appendix B for a on rete example of this.
+
+with asymmetri al round stru tures. To prote t against these atta ks, ipher
+designers should ensure that there are no good di erentials for the rst or last
+half of their ipher.
+
+12 A knowledgements
+We are grateful to a number of readers whose omments have improved the
+paper substantially: Serge Vaudenay o ered a number of helpful omments on
+an early version of this paper and allowed us to use his ni e one-line summary of
+the atta k; Eli Biham suggested looking at redu ed-round versions of FEAL, and
+pointed out the relevan e of the 3-round hara teristi s of probability 1; Carlisle
+Adams, Alex Biryukov, and the anonymous reviewers gave helpful feedba k on
+the exposition; and nally, we would like to thank all those patient readers who
+suggested in luding Figure 1 in this paper.
+
+Referen es
+[Ada98℄ C. Adams, \The CAST-256 En ryption Algorithm," NIST AES Proposal,
+Jun 98.
+[Ada99℄ C. Adams, personal ommuni ation, Feb 1999.
+[BBS98℄ E. Biham, A. Biryukov, A. Shamir. \Cryptanalysis of Skipja k Redu ed to
+31 Rounds using Impossible Di erentials," EUROCRYPT'99, to appear.
+[BBS99℄ E. Biham, A. Biryukov, A. Shamir. \Miss in the Middle Atta ks on IDEA,
+Khufu, and Khafre," this volume.
+[BB+98℄ E. Biham, A. Biryukov, O. Dunkelmann, E. Ri hardson, A. Shamir, \Initial Observations on the Skipja k En ryption Algorithm," SAC'98, SpringerVerlag, 1998.
+[Bih99℄ E. Biham, personal ommuni ation, Mar 1999.
+[BS93℄ E. Biham, A. Shamir, Di erential Cryptanalysis of the Data En ryption Standard, Springer-Verlag, 1993.
+[BC+98℄ C. Burwi k, D. Coppersmith, E. D'Avignon, R. Gennaro, S. Halevi, C. Jutla,
+S.M. Matyas, L. O'Connor, M. Peyravian, D. Sa ord, and N. Zuni , \MARS
+| A Candidate Cipher for AES," NIST AES Proposal, Jun 98.
+[GG+98℄ H. Gilbert, M. Girault, P. Hoogvorst, F. Noilhan, T. Pornin, G. Poupard,
+J. Stern, S. Vaudenay, \De orrelated Fast Cipher: an AES Candidate," NIST
+AES Proposal, Jun 98.
+[GC94℄ H. Gilbert and P. Chauvaud, \A hosen plaintext atta k of the 16-round
+Khufu ryptosystem," CRYPTO'94, LNCS 839, Springer-Verlag, 1994.
+[GLC98℄ D. Georgoudis, D. Lerous, and B.S. Chaves, \The `Frog' En ryption Algorithm," NIST AES Proposal, Jun 98.
+[HL94℄ M. Hellman and S. Langford., \Di erential{linear ryptanalysis,"
+CRYPTO'94, LNCS 839, Springer-Verlag, 1994.
+[KSW97℄ J. Kelsey, B. S hneier, D. Wagner, \Related-Key Cryptanalysis of 3-WAY,
+Biham-DES, CAST, DES-X, NewDES, RC2, and TEA," ICICS'97, SpringerVerlag, 1997.
+[Knu95℄ L.R. Knudsen, \Trun ated and Higher Order Di erentials," Fast Software
+En ryption, 2nd International Workshop Pro eedings, Springer-Verlag, 1995.
+
+[Knu98℄ L. Knudsen, \DEAL|A 128-bit Blo k Cipher," NIST AES Proposal, Jun 98.
+[Lai94℄ X. Lai, \Higher Order Derivations and Di erential Cryptanalysis," Communi ations and Cryptography: Two Sides of One Tapestry, Kluwer A ademi
+Publishers, 1994, pp. 227{233.
+[Mer90℄ R. C. Merkle, \Fast Software En ryption Fun tions", CRYPTO'90, SpringerVerlag, 1990.
+[NW97℄ R. Needham and D. Wheeler, \TEA Extensions," unpublished manus ript,
+Mar 1997.
+[NSA98℄ NSA, \Skipja k and KEA algorithm spe i ations," May 1998. Available
+from http:// sr .n sl.nist.gov/en ryption/skipja k-1.pdf.
+[Saa98℄ M.-J. Saarinen, \Cryptanalysis of Blo k Tea," unpublished manus ript, 20
+O t 1998.
+[SK+98℄ B. S hneier, J. Kelsey, D. Whiting, D. Wagner, C. Hall, N. Ferguson, \Performan e Comparison of the AES Submissions," Se ond AES Conferen e, 1999.
+[V97℄
+S. Vaudenay, \A heap paradigm for blo k ipher strengthening," LIENS te h
+report 97-3, 1997.
+[V98℄
+S. Vaudenay, \Provable Se urity for Blo k Ciphers by De orrelation,"
+STACS'98, Springer-Verlag LNCS 1373, 1998.
+[V98b℄ S. Vaudenay, \Feistel Ciphers with L2 -De orrelation," SAC'98, SpringerVerlag, 1998.
+[Yuv97℄ G. Yuval, \Reinventing the Travois: En ryption/ MAC in 30 ROM Bytes,"
+FSE'97, LNCS 1267, 1997.
+
+A Meet-in-the-middle atta k on COCONUT98
+The very simple key s hedule used in COCONUT98 exposes it to meet-in-themiddle atta ks. The problem is that there are only 96 bits of entropy in the rst
+four round subkeys, and a similar property holds for the last four round subkeys.
+Therefore, with just four known texts and about 296 oine work, one an break
+COCONUT98 using standard meet-in-the-middle te hniques5 . The workfa tor
+of this atta k is disappointingly low for a ipher with a 256-bit key.
+When the key is hosen non-uniformly, e.g. from a passphrase, this atta k
+an be even more deadly. If we assume a key entropy of 4 bits/byte (probably
+a gross overestimate for most passphrases), the workfa tor of the meet-in-themiddle atta k an be redu ed to approximately 248 trial en ryptions. This is
+mu h faster than exhaustive keysear h.
+
+B A CAST-256 variant
+In this se tion, we onsider a simple CAST-256 variant obtained by ex hanging
+the order of the A rounds and the B rounds. (In other words, the variant ipher
+5
+
+Spe i ally: Obtain four known text pairs Pj ; Cj for j = 1; 2; 3; 4. Guess K3 ; K4 . For
+ea h possibility for K1 , store ( 0 (P0 )
+0 (P1 ))=( 0 (P2 )
+0 (P3 )); K1 in a lookup
+table keyed on the rst omponent. Finally, for ea h possibility for K2 , we ompute
+( 1 1 (C0 ) 1 1 (C1 ))=( 1 1 (C2 ) 1 1 (C3 )) and look for a mat h in the lookup table.
+
+uses the B rounds rst.) The primary ontribution is that su h a variant an be
+readily analyzed using boomerang atta ks.
+Please note that this atta k does not apply to CAST-256 (only to a variant
+with a di erent round stru ture)6 . Sin e the designers of CAST-256 already
+knew of the need to apply the A rounds rst [Ada99℄, we feel that the variant
+does injusti e to the spirit of the CAST-256 design. We fo us on CAST-256
+primarily be ause it makes su h a simple, lean platform for analysis of novel
+round stru tures. We believe our atta k on this CAST-256 variant gives new
+insights into the properties of various iphers with generalized Feistel round
+stru tures [NSA98,BC+98,GLC98,Yuv97,NW97,Saa98℄, so we hope the analysis
+is of independent interest.
+The sheer number of rounds makes it hard to mount good atta ks on the
+full 48-round CAST-256. In this se tion, we show that boomerang atta ks with
+omplexity 248:5 {265 are possible on 24{25 rounds of the variant ipher. These
+atta ks do not appear to extend to the original CAST-256 round ordering, so we
+believe this provides some additional justi ation that CAST-256 is using the
+right round ordering.
+A simple atta k on 24 rounds. We use the trun ated di erential  =
+(0; 0; 0; a) ! (b; ; d; a) =  for the 12 B rounds (where a may take on any nonzero value, and b; ; d are arbitrary). For the inverse of the last half of the ipher,
+we use a similar trun ated di erential: namely, r = (0; 0; 0; e) ! (f; g; h; e) =
+r .
+Using the ma hinery developed in Se tion 6, the omputation of the su ess probability is straightforward. Both of these trun ated di erentials have
+probability 1, and  !  has probability 2 96 . Finally, we note that
+Pr[w  x  y 2  j w 2  ; x; y 2 r ℄ = Pr[a  e  e0 6= 0℄ = 1
+
+2 32 ;
+
+so the overall su ess probability is p  2 96 .
+We start the atta k by hoosing 232 plaintexts Pi where the rst three words
+are held xed and the last takes on all 232 possibilities, and we obtain the
+orresponding iphertexts Ci . For ea h su h iphertext Ci , we generate 216:5
+new iphertexts Di;j by varying the nal word. Then we de rypt ea h Di;j to
+obtain the orresponding plaintext Qi;j . This gives us 263 hoi es for P; P 0 from
+the pool of plaintexts Pi and another 233 hoi es for D; D0 from the Di;j . In all,
+there will be 296 possible quartets to hoose from. About p  2 96 of them will
+form right quartets, so we expe t to see one right quartet. The ex ellent ltering
+available (we an lter on all 128 bits of Q  Q0 ) allows us to eliminate all the
+wrong quartets with high probability.
+This immediately gives a way to distinguish the 24-round CAST-256 variant
+from a ideal ipher with 248:5 adaptively hosen texts and a low workfa tor.
+A key-re overy atta k on 25 rounds. The same ideas an also be used
+to develop key re overy atta ks. For instan e, we an break the 25-round variant
+obtained by prepending one more B round at the beginning with 265 hosen
+6
+
+See also Se tion 9, whi h analyzes 16 rounds of the real CAST-256 ipher (without
+any re-ordering of the rounds).
+
+texts and a similar amount of work. Due to la k of spa e, we give only a very
+brief sket h of the atta k: we bypass the rst round with stru tures, and then in
+the analysis phase we guess the rst-round subkey, peel o the rst round, and
+he k for the existen e of right quartets.
+Dis ussion. It is worth omparing our results to what is attainable with
+onventional trun ated di erential ryptanalysis. In the ase of this CAST-256
+variant, boomerang atta ks seem to ompare favorably for up to 24 rounds, due
+to the asymmetri round stru ture, but for more than 25 rounds onventional
+te hniques are at least as good as the boomerang.
+The astute reader will have noti ed that our trun ated di erentials  !
+ (for the 12 B rounds) and r ! r (for the 12 A rounds) an be readily
+on atenated to obtain a trun ated di erential  = (0; 0; 0; a) ! (0; 0; 0; a) = r
+of probability 2 96 for the entire ipher. The resulting 24-round di erential will
+have probability 2 96 , and an be used in a onventional trun ated di erential
+atta k that distinguishes the 24-round CAST-256 variant from a ideal ipher
+with 265 (non-adaptive) hosen plaintexts. Note that you an also get a missin-the-middle atta k on the 24-round variant with the same te hniques, sin e
+(0; 0; 0; a) ! (0; 0; 0; a0 ) is an impossible di erential when a 6= a0 . This gives an
+atta k that uses 265 hosen plaintexts and not mu h work.
+Thus, our 24-round boomerang atta k (248:5 adaptive hosen-plaintext and
+hosen- iphertext queries) seems better than the onventional trun ated di erential atta k (265 hosen plaintexts) or the miss-in-the-middle atta k (265 hosen
+plaintexts), but it loses its advantage at 25 rounds.
+One reason why the boomerang atta k su eeds against the CAST-256 variant is that CAST-256 rounds exhibit a de nite asymmetry. In both Skipja k
+and CAST-256, the A rounds have weaker di usion in the reverse dire tion than
+in the forward dire tion, while the B rounds are stronger in the reverse dire tion. Thus, the ombination of A and B rounds makes onventional di erential
+atta ks harder than usual: whether we atta k the ipher or the inverse ipher,
+we will have to push a di erential through 12 \strong rounds". In ontrast, the
+boomerang atta k allows us to follow the path of least resistan e in both dire tions, be ause we over the B rounds with a di erential running in the forward
+dire tion and over the A rounds with a di erential running in the reverse dire tion. This makes the boomerang atta k espe ially well-suited to the analysis
+of a as ade of B rounds followed by A rounds.
+By the same line of reasoning, boomerang te hniques would be espe ially
+weak at analyzing the real CAST-256 ipher, where the A rounds pre ede the B
+rounds. A boomerang atta k on CAST-256 would be atta king the ipher at all
+of its strongest points, and thus boomerang te hniques would be a parti ularly
+poor tool for analyzing the real CAST-256 round stru ture.
+
+
