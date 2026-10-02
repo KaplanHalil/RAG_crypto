@@ -159,8 +159,8 @@ class OpenAILLM(LLMProvider):
 def build_llm_provider(settings: Settings) -> LLMProvider:
     """Instantiate the configured LLM provider.
 
-    When a ``cryptorag.json`` config exists, its model registry wins.
-    Otherwise the legacy env-driven behaviour (``CRAG_LLM_BACKEND`` …) is
+    When a ``chirag.json`` config exists, its model registry wins.
+    Otherwise the legacy env-driven behaviour (``CHIRAG_LLM_BACKEND`` …) is
     preserved.
     """
     from .models import config_file_used, get_registry
@@ -170,7 +170,7 @@ def build_llm_provider(settings: Settings) -> LLMProvider:
 
     if settings.llm_backend == "openai":
         if not settings.openai_api_key:
-            raise ValueError("llm_backend='openai' requires CRAG_OPENAI_API_KEY")
+            raise ValueError("llm_backend='openai' requires CHIRAG_OPENAI_API_KEY")
         return OpenAILLM(
             api_key=settings.openai_api_key,
             model=settings.openai_llm_model,

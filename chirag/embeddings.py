@@ -121,8 +121,8 @@ class ChromadbEmbeddingFunction:
 def build_embedding_provider(settings: Settings) -> EmbeddingProvider:
     """Instantiate the configured embedding provider.
 
-    When a ``cryptorag.json`` config exists, its embedding section wins.
-    Otherwise the legacy env-driven behaviour (``CRAG_EMBEDDING_BACKEND`` …)
+    When a ``chirag.json`` config exists, its embedding section wins.
+    Otherwise the legacy env-driven behaviour (``CHIRAG_EMBEDDING_BACKEND`` …)
     is preserved.
     """
     from .models import config_file_used, get_registry
@@ -133,7 +133,7 @@ def build_embedding_provider(settings: Settings) -> EmbeddingProvider:
     if settings.embedding_backend == "openai":
         if not settings.openai_api_key:
             raise ValueError(
-                "embedding_backend='openai' requires CRAG_OPENAI_API_KEY"
+                "embedding_backend='openai' requires CHIRAG_OPENAI_API_KEY"
             )
         return OpenAIEmbeddings(
             api_key=settings.openai_api_key,

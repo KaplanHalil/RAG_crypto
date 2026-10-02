@@ -9,7 +9,7 @@ LLM judge.
 
 Run with::
 
-    python -m crypto_rag.evaluation --out results/ --answer 10
+    python -m chirag.evaluation --out results/ --answer 10
 """
 
 from __future__ import annotations
@@ -247,7 +247,7 @@ def plot_curves(retriever_metrics: Dict[str, Dict[int, Dict[str, float]]],
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="CryptoRAG evaluation harness")
+    ap = argparse.ArgumentParser(description="Chirag evaluation harness")
     ap.add_argument("--benchmark",
                     default=str(PROJECT_ROOT / "eval" / "qa_benchmark.json"))
     ap.add_argument("--out", default=str(PROJECT_ROOT / "results"))

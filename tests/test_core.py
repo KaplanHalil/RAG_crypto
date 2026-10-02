@@ -1,14 +1,14 @@
-"""Unit tests for the CryptoRAG core. Fast tests only (no network, no models)."""
+"""Unit tests for the Chirag core. Fast tests only (no network, no models)."""
 
 import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from crypto_rag.chunker import Chunker
-from crypto_rag.ingestion import Document, classify_doc_type
-from crypto_rag.prompt import assemble_context, build_user_prompt
-from crypto_rag.retriever import BM25Scorer, _rrf
+from chirag.chunker import Chunker
+from chirag.ingestion import Document, classify_doc_type
+from chirag.prompt import assemble_context, build_user_prompt
+from chirag.retriever import BM25Scorer, _rrf
 
 
 def test_chunker_respects_size():

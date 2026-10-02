@@ -4,8 +4,12 @@
       "type": "ollama",
       "base_url": "http://localhost:11434",
       "models": {
-        "qwen3.5:9b": { "name": "Qwen3.5 9B (local)" },
-        "gemma4:26b": { "name": "Gemma4 26B (local)" }
+        "qwen3.5:9b": {
+          "name": "Qwen3.5 9B (local)"
+        },
+        "gemma4:26b": {
+          "name": "Gemma4 26B (local)"
+        }
       }
     },
     "tubitak-qwen": {
@@ -13,7 +17,7 @@
       "base_url": "https://ai-api.tubitak.gov.tr/vllm/qwen3coder-80b/v1",
       "models": {
         "Qwen3Coder-80B": {
-          "name": "Qwen3Coder-80B (TÜBİTAK)"
+          "name": "Qwen3Coder-80B (T\u00dcB\u0130TAK)"
         }
       }
     }
@@ -23,6 +27,6 @@
     "model": "nomic-embed-text"
   },
   "defaults": {
-    "llm": "qwen3.5:9b"
+    "llm": "Qwen3Coder-80B"
   }
 }

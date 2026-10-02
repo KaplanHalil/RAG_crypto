@@ -1,4 +1,4 @@
-"""CryptoRAG: a modular, locally-deployable retrieval-augmented generation
+"""Chirag: a modular, locally-deployable retrieval-augmented generation
 system for cryptography and cryptanalysis.
 
 The package provides ingestion, chunking, embedding, vector retrieval,

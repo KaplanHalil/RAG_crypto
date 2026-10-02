@@ -26,6 +26,23 @@ NO_ANSWER = (
     "or ingest a related document first."
 )
 
+# Common Turkish words/fragments that flag an ASCII-only question (e.g. türkçe
+# written without diacritics) as needing translation before retrieval.
+_TURKISH_MARKERS = (
+    " nedir", " ne", " nasıl", " neden", " nerede", " niçin", " mı ", " mi ",
+    " mu ", " mü ", " anlat", " açıkla", " acikla", " yaz", " örnek", " örn",
+    " kaç", " kaç ", " hakkında", " hakkinda", " için", " icin", " ve ",
+    " ile", " lineer", " kriptanaliz", " kriptoanaliz", " şifre", " sifre",
+    " şifreleme", " sifreleme", " anahtar", " atak", " saldırı", " saldiri",
+    " makale", " doküman", " dokuman", " inceleyelim", " açıklaması",
+    " aciklamasi", " yapılır", " yapilir", " bulunur", " hangi", " nedir",
+)
+
+
+def _has_turkish_marker(question: str) -> bool:
+    q = f" {question.strip().lower()} "
+    return any(marker in q for marker in _TURKISH_MARKERS)
+
 
 def chunk_id(doc: Document, chunk: Chunk) -> str:
     """Stable unique id for a chunk (deduplicates ingests)."""
@@ -77,9 +94,13 @@ class RAGPipeline:
         The corpus and the embedding model are English; a non-Latin query
         (e.g. Turkish ``küp atağı``) retrieves almost nothing. When enabled,
         such questions are translated first. Already-ASCII questions pass
-        through untouched (no extra LLM call).
+        through untouched UNLESS they contain a Turkish marker (for example
+        "lineer kriptanalizin ne olduğunu anlat" is plain ASCII but clearly
+        Turkish).
         """
-        if not self.settings.translate_queries or question.isascii():
+        if not self.settings.translate_queries:
+            return question
+        if question.isascii() and not _has_turkish_marker(question):
             return question
         for _attempt in range(2):  # thinking models can echo the input; retry
             try:

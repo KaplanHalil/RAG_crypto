@@ -1,6 +1,6 @@
 """Model registry: opencode-style provider/model configuration.
 
-CryptoRAG reads a JSON config (``cryptorag.json``) very much like opencode's
+Chirag reads a JSON config (``chirag.json``) very much like opencode's
 ``opencode.json``. You can register any number of providers and models and
 switch between them from the TUI or the CLI without touching code::
 
@@ -28,10 +28,10 @@ switch between them from the TUI or the CLI without touching code::
 
 Config files are searched in this order (first match wins), like opencode::
 
-    $CRAG_CONFIG                      explicit override
-    <project_root>/cryptorag.json     project config
-    <project_root>/.cryptorag.json    project config (hidden)
-    ~/.config/cryptorag/config.json   global config
+    $CHIRAG_CONFIG                      explicit override
+    <project_root>/chirag.json     project config
+    <project_root>/.chirag.json    project config (hidden)
+    ~/.config/chirag/config.json   global config
 
 The project file is deep-merged OVER the global file. API keys use the
 opencode ``env:VAR_NAME`` syntax and are resolved from the environment; they
@@ -49,14 +49,14 @@ from .config import PROJECT_ROOT, Settings, get_settings
 from .llm import LLMProvider, OllamaLLM, OpenAILLM
 from .embeddings import EmbeddingProvider, OllamaEmbeddings, OpenAIEmbeddings
 
-CONFIG_NAMES = ("cryptorag.json", ".cryptorag.json")
-DEFAULT_GLOBAL_CONFIG = Path.home() / ".config" / "cryptorag" / "config.json"
+CONFIG_NAMES = ("chirag.json", ".chirag.json")
+DEFAULT_GLOBAL_CONFIG = Path.home() / ".config" / "chirag" / "config.json"
 
 
 # ----------------------------------------------------------------- config I/O
 def config_paths() -> List[Path]:
     """Candidate config files, most specific first."""
-    override = os.environ.get("CRAG_CONFIG")
+    override = os.environ.get("CHIRAG_CONFIG")
     if override:
         return [Path(override).expanduser()]
     paths = [PROJECT_ROOT / name for name in CONFIG_NAMES]

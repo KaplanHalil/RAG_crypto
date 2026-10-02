@@ -1,4 +1,4 @@
-"""Tests for the stdlib HTTP API server (crypto_rag/server.py).
+"""Tests for the stdlib HTTP API server (chirag/server.py).
 
 Runs the server on an ephemeral port with an injected stub pipeline, so no
 network / models / ChromaDB are required.
@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from http.server import ThreadingHTTPServer
 
-import crypto_rag.models as models
+import chirag.models as models
 
 
 class _StubLLM:
@@ -85,7 +85,7 @@ def _reset_registry():
 
 @pytest.fixture()
 def server_url():
-    from crypto_rag.server import make_handler
+    from chirag.server import make_handler
     httpd = ThreadingHTTPServer(("127.0.0.1", 0),
                                 make_handler(_StubPipeline()))
     port = httpd.server_address[1]

@@ -1,18 +1,18 @@
-"""Command-line interface for CryptoRAG.
+"""Command-line interface for Chirag.
 
-Running ``cryptorag`` with no arguments launches the interactive terminal UI.
+Running ``chirag`` with no arguments launches the interactive terminal UI.
 
 Usage::
 
-    cryptorag                      # launch the TUI
-    cryptorag index-corpus
-    cryptorag query "How does linear cryptanalysis work?"
-    cryptorag query --top-k 8 --model qwen3.5:9b "question"
-    cryptorag ingest-rfc 9180
-    cryptorag ingest-file path/to/paper.pdf
-    cryptorag summarize "RFC 8446"
-    cryptorag stats
-    cryptorag eval
+    chirag                      # launch the TUI
+    chirag index-corpus
+    chirag query "How does linear cryptanalysis work?"
+    chirag query --top-k 8 --model qwen3.5:9b "question"
+    chirag ingest-rfc 9180
+    chirag ingest-file path/to/paper.pdf
+    chirag summarize "RFC 8446"
+    chirag stats
+    chirag eval
 """
 
 from __future__ import annotations
@@ -106,7 +106,7 @@ def cmd_config(args: argparse.Namespace) -> None:
 
     path = config_file_used()
     if path is None:
-        print("No cryptorag.json found. Using environment-driven settings "
+        print("No chirag.json found. Using environment-driven settings "
               "(see .env.example).")
         return
     print(f"Config file: {path}")
@@ -125,7 +125,7 @@ def cmd_eval(args: argparse.Namespace) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="crypto_rag", description="CryptoRAG CLI")
+    p = argparse.ArgumentParser(prog="chirag", description="Chirag CLI")
     p.set_defaults(func=cmd_chat)
     sub = p.add_subparsers(dest="command")
 
@@ -136,7 +136,7 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("question", nargs="+")
     sp.add_argument("--top-k", type=int, default=None)
     sp.add_argument("--model", default=None,
-                    help="override LLM (any model from cryptorag.json)")
+                    help="override LLM (any model from chirag.json)")
     sp.add_argument("--type", default=None,
                     help="filter: RFC Document | NIST Standard | "
                          "Cryptanalysis Paper | Cryptography Paper | All")

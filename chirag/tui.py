@@ -1,9 +1,9 @@
-"""Interactive terminal chat UI for CryptoRAG, built with Textual.
+"""Interactive terminal chat UI for Chirag, built with Textual.
 
 Run with::
 
-    cryptorag                 # bare command launches the TUI
-    python -m crypto_rag.cli chat
+    chirag                 # bare command launches the TUI
+    python -m chirag.cli chat
 
 Features: streamed answers with inline sources, multi-turn chat memory,
 on-the-fly model / Top-K / document-type controls, session save & load,
@@ -14,6 +14,7 @@ tokens, sources).
 from __future__ import annotations
 
 import json
+import os
 import time
 from datetime import datetime
 from pathlib import Path
@@ -29,11 +30,12 @@ from textual.widgets import DataTable, Footer, Input, Label, Markdown, Select, S
 
 from .config import get_settings, PROJECT_ROOT
 from .embeddings import build_embedding_provider
-from .models import build_llm, list_chat_models
+from .models import build_llm, get_registry, list_chat_models
 from .pipeline import RAGPipeline
 from .vector_store import VectorStore
 
 SESSION_DIR = PROJECT_ROOT / "data" / "sessions"
+CORPUS_DIR = PROJECT_ROOT / "kripto_makaleler"
 
 CSS = """
 Screen {
@@ -130,6 +132,7 @@ class DocumentsScreen(Screen):
     BINDINGS = [
         ("escape", "close_docs", "Close"),
         ("q", "close_docs", "Close"),
+        ("d", "delete_document", "Delete"),
     ]
     CSS = """
     #docs-screen {
@@ -180,10 +183,18 @@ class DocumentsScreen(Screen):
         background: #0e0f12;
     }
     Label#docs-summary {
-        height: 1;
+        height: auto;
+        min-height: 1;
+        max-height: 4;
         padding: 0 2;
         color: #7c7f8c;
         content-align: left middle;
+    }
+    Label#docs-summary .notice {
+        color: #f07178;
+    }
+    Label#docs-summary .notice-ok {
+        color: #9ece6a;
     }
     """
 
@@ -195,6 +206,8 @@ class DocumentsScreen(Screen):
         self._search: str = ""
         self._sort_col: str = "chunks"
         self._sort_desc: bool = True
+        self._confirm_source: Optional[str] = None
+        self._notice: str = ""
 
     def compose(self) -> ComposeResult:
         with Vertical(id="docs-screen"):
@@ -228,6 +241,10 @@ class DocumentsScreen(Screen):
         if event.input.id == "docs-search":
             self._search = event.value
             self._populate()
+
+    def on_input_submitted(self, event: Input.Submitted) -> None:
+        if event.input.id == "docs-search":
+            self.query_one("#docs-table", DataTable).focus()
 
     def on_data_table_header_selected(self,
                                       event: DataTable.HeaderSelected) -> None:
@@ -283,17 +300,95 @@ class DocumentsScreen(Screen):
         arrow = "▼" if self._sort_desc else "▲"
         self.query_one("#docs-title", Label).update(
             f"Documents — {total_docs} doküman, {total_chunks} chunk")
-        self.query_one("#docs-summary", Label).update(
-            f"gösterilen: {len(docs)} doküman / {shown_chunks} chunk"
-            f"    ·  {self._type_filter}  ·  sıralama: {self._sort_col} {arrow}"
-            f"    ·  filtre: {self._search or '—'}")
+        base = (f"gösterilen: {len(docs)} doküman / {shown_chunks} chunk"
+                f"    ·  {self._type_filter}  ·  sıralama: {self._sort_col} {arrow}"
+                f"    ·  filtre: {self._search or '—'}")
+        lines = [base]
+        if self._notice:
+            cls = "notice-ok" if self._notice.startswith("Silindi") else "notice"
+            lines.append(f"[{cls}]{self._notice}[/{cls}]")
+        self.query_one("#docs-summary", Label).update("\n".join(lines))
+
+    # ----------------------------------------------------------------- delete
+    def _current_source(self) -> Optional[str]:
+        """Source of the document under the table cursor (if any)."""
+        table = self.query_one("#docs-table", DataTable)
+        if table.row_count == 0:
+            return None
+        row_index = table.cursor_row
+        if row_index is None or row_index >= table.row_count:
+            return None
+        row = table.get_row_at(row_index)
+        return row[4] if row else None
+
+    def _source_file(self, source: str) -> Optional[Path]:
+        """The corpus file behind ``source``, if one exists on disk."""
+        path = CORPUS_DIR / source
+        return path if path.is_file() else None
+
+    def action_delete_document(self) -> None:
+        source = self._current_source()
+        if source is None:
+            self._notice = "Satır yok — silinecek bir şey seçilmedi."
+            self._populate()
+            return
+        doc = next((d for d in self._docs if d.get("source") == source), {})
+        file = self._source_file(source)
+
+        if self._confirm_source != source:
+            self._confirm_source = source
+            self._notice = (
+                "DİKKAT: silinecek  "
+                f"'{doc.get('title', source)}' ({doc.get('chunk_count', 0)} chunk)  "
+                + (f"dosya: {file.name}  " if file else "")
+                + "— tekrar d bas = SİL · esc = vazgeç")
+            self._populate()
+            return
+
+        self._perform_delete(source, doc, file)
+
+    def _perform_delete(self, source: str, doc: dict,
+                        file: Optional[Path]) -> None:
+        try:
+            removed = self.pipeline.store.delete_document(source)
+        except Exception as exc:
+            self._confirm_source = None
+            self._notice = f"Silme başarısız: {exc}"
+            self._populate()
+            return
+
+        file_note = ""
+        if file is not None:
+            try:
+                os.remove(str(file))
+                file_note = f"  ·  dosya silindi: {file.name}"
+            except Exception as exc:
+                file_note = f"  ·  DOSYA SİLİNEMEDİ: {exc}"
+
+        if removed:
+            self._docs = [d for d in self._docs if d.get("source") != source]
+            self._confirm_source = None
+            self._notice = (f"Silindi: {doc.get('title', source)}"
+                            f" ({doc.get('chunk_count', 0)} chunk){file_note}")
+        else:
+            self._notice = f"Bulunamadı (zaten silinmiş olabilir): {source}"
+            self._confirm_source = None
+        self._populate()
 
     def action_close_docs(self) -> None:
+        if self._confirm_source is not None:
+            self._confirm_source = None
+            self._notice = "Silme iptal edildi."
+            self._populate()
+            return
         self.app.pop_screen()
+        refresh = getattr(self.app, "_refresh_stats", None)
+        if callable(refresh):
+            refresh()
 
 
 class ChatApp(App):
-    """CryptoRAG terminal chat."""
+    """Chirag terminal chat."""
 
     CSS = CSS
     BINDINGS = [
@@ -304,7 +399,7 @@ class ChatApp(App):
         ("ctrl+y", "copy_last", "Copy"),
         ("ctrl+o", "open_documents", "Documents"),
     ]
-    TITLE = "CryptoRAG — Terminal"
+    TITLE = "Chirag — Terminal"
 
     def __init__(self) -> None:
         super().__init__()
@@ -312,7 +407,7 @@ class ChatApp(App):
         self.pipeline: Optional[RAGPipeline] = None
         self.top_k: int = self.settings.default_top_k
         self.doc_filter: str = "All"
-        self.current_model: str = self.settings.llm_model
+        self.current_model: str = get_registry().default_llm()
         self._busy = False
         self._cancel_requested = False
         self._ask_worker: Any = None
@@ -340,9 +435,13 @@ class ChatApp(App):
                 seen.add(m)
         if not model_options:
             model_options = [(self.settings.llm_model, self.settings.llm_model)]
-        default_model = (self.settings.llm_model
-                         if self.settings.llm_model in seen
-                         else model_options[0][1])
+        # prefer the configured default (chirag.json "defaults.llm"); falls
+        # back to the env-driven model and then to the first listed model
+        default_model = (get_registry().default_llm()
+                         if get_registry().default_llm() in seen
+                         else (self.settings.llm_model
+                               if self.settings.llm_model in seen
+                               else model_options[0][1]))
         self.current_model = default_model
 
         with Horizontal(id="settingsbar"):
@@ -357,7 +456,7 @@ class ChatApp(App):
         yield Static("", id="statsbar")
         with VerticalScroll(id="chat"):
             yield Static(
-                "Welcome to CryptoRAG.\n"
+                "Welcome to Chirag.\n"
                 "Ask a question below, or type /help for commands.\n"
                 "Answers stream in as they are generated.",
                 id="welcome", classes="note",
@@ -393,10 +492,11 @@ class ChatApp(App):
                 pass
 
     def _set_model(self, model: str) -> None:
+        changed = self.current_model != model
         self.current_model = model
         if self.pipeline is not None:
             self.pipeline.llm = build_llm(model)
-        if self.settings.llm_model != model:
+        if changed:
             self._info(f"Switched to model: {model}")
 
     def _refresh_stats(self) -> None:
@@ -542,7 +642,7 @@ class ChatApp(App):
     # -------------------------------------------------------------- messages
     def _append_message(self, role: str, text: str) -> Markdown:
         chat = self.query_one("#chat", VerticalScroll)
-        me = "You" if role == "user" else "CryptoRAG"
+        me = "You" if role == "user" else "Chirag"
         cls = "md-user" if role == "user" else "md-assistant"
         md = Markdown(f"**{_now()} {me}**\n\n{text}", classes=cls)
         chat.mount(md)
@@ -553,7 +653,7 @@ class ChatApp(App):
         chat = self.query_one("#chat", VerticalScroll)
         self._stream_buf = []
         self._stream_flush_scheduled = False
-        self._stream_header = f"**{_now()} CryptoRAG**"
+        self._stream_header = f"**{_now()} Chirag**"
         self._stream_markdown = Markdown(
             f"{self._stream_header}\n\n_Thinking…_", classes="md-assistant")
         chat.mount(self._stream_markdown)
@@ -565,7 +665,7 @@ class ChatApp(App):
                          is_error: bool = False) -> None:
         if self._stream_markdown is None:
             return
-        header = getattr(self, "_stream_header", None) or f"**{_now()} CryptoRAG**"
+        header = getattr(self, "_stream_header", None) or f"**{_now()} Chirag**"
         if is_error:
             body = f"**{header}**\n\n*{answer}*"
         else:
@@ -755,7 +855,7 @@ class ChatApp(App):
     # --------------------------------------------------------------- helpers
     def _info(self, text: str) -> None:
         chat = self.query_one("#chat", VerticalScroll)
-        md = Markdown(f"**{_now()} CryptoRAG**\n\n{text}", classes="md-info")
+        md = Markdown(f"**{_now()} Chirag**\n\n{text}", classes="md-info")
         chat.mount(md)
         chat.scroll_end(animate=False)
 

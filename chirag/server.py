@@ -1,14 +1,14 @@
-"""HTTP API server for CryptoRAG (pure stdlib, no extra dependencies).
+"""HTTP API server for Chirag (pure stdlib, no extra dependencies).
 
 Two interfaces on one port:
 
 * a small JSON REST API (``/api/...``) for querying, ingesting and stats, and
 * an OpenAI-compatible ``/v1/chat/completions`` endpoint so any tool (opencode,
-  curl, custom apps) can use CryptoRAG as a chat model.
+  curl, custom apps) can use Chirag as a chat model.
 
 Run with::
 
-    cryptorag serve --host 127.0.0.1 --port 8000
+    chirag serve --host 127.0.0.1 --port 8000
 """
 
 from __future__ import annotations
@@ -41,11 +41,11 @@ def _build_pipeline() -> RAGPipeline:
     return RAGPipeline(settings, store, provider, llm)
 
 
-class CryptoRAGHandler(BaseHTTPRequestHandler):
+class ChiragHandler(BaseHTTPRequestHandler):
     """Serves the REST + OpenAI-compatible API for one pipeline instance."""
 
     pipeline: Optional[RAGPipeline] = None  # set via make_handler()
-    server_version = "CryptoRAG/1.0"
+    server_version = "Chirag/1.0"
 
     # --------------------------------------------------------------- helpers
     def _send_json(self, status: int, payload: Any) -> None:
@@ -136,7 +136,7 @@ class CryptoRAGHandler(BaseHTTPRequestHandler):
     # ---------------------------------------------------------------- REST
     def _handle_index(self) -> None:
         self._send_json(200, {
-            "name": "CryptoRAG API",
+            "name": "Chirag API",
             "endpoints": [
                 "GET  /api/stats",
                 "GET  /api/models",
@@ -314,7 +314,7 @@ class CryptoRAGHandler(BaseHTTPRequestHandler):
                     "choices": [{"index": 0,
                                  "delta": {"role": "assistant"},
                                  "finish_reason": None}],
-                    "crypto_rag": {"sources": event["sources"]},
+                    "chirag": {"sources": event["sources"]},
                 }))
             elif et == "token":
                 self._send_event(json.dumps({
@@ -349,13 +349,13 @@ class CryptoRAGHandler(BaseHTTPRequestHandler):
             }],
             "usage": {"prompt_tokens": None, "completion_tokens": None,
                       "total_tokens": None},
-            "crypto_rag": {"sources": sources},
+            "chirag": {"sources": sources},
         }
 
 
 def make_handler(pipeline: RAGPipeline) -> type:
     """Return a handler class bound to a concrete pipeline (testable)."""
-    class _Bound(CryptoRAGHandler):
+    class _Bound(ChiragHandler):
         pass
     _Bound.pipeline = pipeline
     return _Bound
@@ -367,7 +367,7 @@ def serve(host: str = "0.0.0.0", port: int = 8000,
     pipeline = pipeline or _build_pipeline()
     os.makedirs(UPLOAD_DIR, exist_ok=True)
     httpd = ThreadingHTTPServer((host, port), make_handler(pipeline))
-    print(f"[api] CryptoRAG API listening on http://{host}:{port}")
+    print(f"[api] Chirag API listening on http://{host}:{port}")
     print(f"[api] REST:  /api/query  ·  OpenAI-compatible: /v1/chat/completions")
     try:
         httpd.serve_forever()

@@ -1,6 +1,6 @@
 {
-  "$schema": "https://example.org/cryptorag-schema.json",
-  "comment": "Copy to cryptorag.json (repo root) or ~/.config/cryptorag/config.json. Global config is merged under the project file. API keys use env:VAR_NAME and are resolved from the environment.",
+  "$schema": "https://example.org/chirag-schema.json",
+  "comment": "Copy to chirag.json (repo root) or ~/.config/chirag/config.json. Global config is merged under the project file. API keys use env:VAR_NAME and are resolved from the environment.",
   "provider": {
     "ollama": {
       "type": "ollama",

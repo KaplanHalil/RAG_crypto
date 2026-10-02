@@ -63,7 +63,7 @@ def classify_doc_type(filename: str) -> str:
 class DocumentLoader:
     """Fetch/read raw documents into the canonical :class:`Document` shape."""
 
-    USER_AGENT = "CryptoRAG/1.0 (research RAG system)"
+    USER_AGENT = "Chirag/1.0 (research RAG system)"
 
     def fetch_rfc(self, rfc_number: int) -> Document:
         url = f"https://www.rfc-editor.org/rfc/rfc{rfc_number}.txt"

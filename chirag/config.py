@@ -1,4 +1,4 @@
-"""Central configuration for the CryptoRAG system.
+"""Central configuration for the Chirag system.
 
 All runtime knobs are read from environment variables (via pydantic-settings)
 so that the same code base can be deployed fully offline with a local Ollama
@@ -15,13 +15,13 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 def project_root() -> Path:
-    """Location of the repo (directory containing the ``crypto_rag`` package).
+    """Location of the repo (directory containing the ``chirag`` package).
 
-    Overridable with the ``CRAG_ROOT`` environment variable. All data paths
+    Overridable with the ``CHIRAG_ROOT`` environment variable. All data paths
     (corpus, ChromaDB, .env, sessions, eval artifacts) resolve from here so
-    the ``cryptorag`` command works from any working directory.
+    the ``chirag`` command works from any working directory.
     """
-    env_root = os.environ.get("CRAG_ROOT")
+    env_root = os.environ.get("CHIRAG_ROOT")
     if env_root:
         return Path(env_root).expanduser().resolve()
     pkg = Path(__file__).resolve().parent
@@ -34,7 +34,7 @@ PROJECT_ROOT = project_root()
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=str(PROJECT_ROOT / ".env"),
-        env_prefix="CRAG_",
+        env_prefix="CHIRAG_",
         extra="ignore",
     )
 
@@ -74,7 +74,7 @@ class Settings(BaseSettings):
 
     # --- Vector store ------------------------------------------------------
     db_path: str = "data/chroma_db"
-    collection_name: str = "crypto_rag"
+    collection_name: str = "chirag"
 
     # --- Generation --------------------------------------------------------
     temperature: float = 0.2

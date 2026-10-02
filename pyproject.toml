@@ -3,13 +3,13 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "crypto-rag"
+name = "chirag"
 version = "1.0.0"
-description = "CryptoRAG: a locally-deployable, citation-aware retrieval-augmented generation system for cryptography and cryptanalysis."
+description = "Chirag: a locally-deployable, citation-aware retrieval-augmented generation system for cryptography and cryptanalysis."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-authors = [{ name = "CryptoRAG" }]
+authors = [{ name = "Chirag" }]
 dependencies = [
     "chromadb>=1.5.0",
     "pypdf>=4.0",
@@ -29,10 +29,10 @@ dev = [
 ]
 
 [project.scripts]
-cryptorag = "crypto_rag.cli:main"
+chirag = "chirag.cli:main"
 
 [tool.setuptools]
-packages = ["crypto_rag"]
+packages = ["chirag"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

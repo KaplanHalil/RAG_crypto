@@ -18,9 +18,9 @@
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
 
-\title[running = {CryptoRAG: Local RAG for Cryptography},
+\title[running = {Chirag: Local RAG for Cryptography},
       subtitle = {A fully local, citation-aware RAG system for cryptography and cryptanalysis}
-     ]{CryptoRAG: A Locally-Deployable, Citation-Aware Retrieval-Augmented Generation System for Cryptography and Cryptanalysis}
+     ]{Chirag: A Locally-Deployable, Citation-Aware Retrieval-Augmented Generation System for Cryptography and Cryptanalysis}
 
 % Temporary placeholder macro (fill before submission)
 \newcommand{\todo}[1]{\textcolor{red}{\textbf{#1}}}
@@ -45,7 +45,7 @@ Retrieval-augmented generation (RAG) addresses this by grounding answers in a
 retrievable corpus, but most RAG deployments rely on commercial APIs, which
 conflicts with the confidentiality requirements of real cryptographic work and
 undermines reproducibility.
-We present \emph{CryptoRAG}, a fully local, citation-aware RAG system for
+We present \emph{Chirag}, a fully local, citation-aware RAG system for
 cryptography and cryptanalysis. The system ingests a curated knowledge base of
 IETF RFCs, NIST standards, and landmark cryptanalysis papers (46 documents,
 $\sim$3{,}600 chunks), retrieves with a hybrid dense-plus-lexical retriever
@@ -85,7 +85,7 @@ This is a poor fit for cryptography, where the queries themselves can be
 sensitive (``is our implementation of the nonce generator leaking?'') and
 where implementation details of security modules must not leave the premises.
 
-In this paper we present \emph{CryptoRAG}, a RAG system that answers
+In this paper we present \emph{Chirag}, a RAG system that answers
 questions about cryptography and cryptanalysis entirely on the users own
 hardware. The system combines:
 
@@ -143,7 +143,7 @@ design choices and evaluation methodology for such systems. In the security
 domain, most RAG demonstrations index vulnerability feeds rather than
 cryptanalytic source material, and we are not aware of a peer-reviewed,
 benchmarked RAG system aimed specifically at the cryptography and
-cryptanalysis literature. CryptoRAG targets that gap, and in contrast to most
+cryptanalysis literature. Chirag targets that gap, and in contrast to most
 prior systems emphasizes a fully local deployment story.
 
 \subsection{Local LLMs and embeddings}
@@ -157,7 +157,7 @@ studies \cite{zheng2023judging}.
 \subsection{AI-assisted cryptographic analysis}
 There is growing interest in using machine learning for cryptanalysis, most
 prominently neural distinguishers for round-reduced block ciphers
-\cite{gohr2019}. CryptoRAG is orthogonal: it does not attack ciphers, but
+\cite{gohr2019}. Chirag is orthogonal: it does not attack ciphers, but
 makes the \emph{existing} cryptanalytic literature and standards reliably
 available to engineers and researchers through a grounded interface.
 
@@ -199,7 +199,7 @@ ablation or for a different deployment.
   \draw[line] (rrf)--(gen);
   \draw[line] (gen)--(ans);
 \end{tikzpicture}
-\caption{CryptoRAG architecture. The same embedding provider serves indexing
+\caption{Chirag architecture. The same embedding provider serves indexing
 and querying; retrieval fuses dense and lexical rankings before generation.}
 \label{fig:arch}
 \end{figure}
@@ -514,7 +514,7 @@ comes from retrieval versus from model capability.
 
 \section{Conclusion}
 
-We presented CryptoRAG, a fully local, citation-aware retrieval-augmented
+We presented Chirag, a fully local, citation-aware retrieval-augmented
 generation system for cryptography and cryptanalysis, and released it as open
 source together with a 49-question grounded benchmark and an evaluation
 harness. On the benchmark, hybrid dense-plus-lexical retrieval with
