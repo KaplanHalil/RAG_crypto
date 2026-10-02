@@ -120,7 +120,8 @@ def cmd_eval(args: argparse.Namespace) -> None:
                 str(args.answer)] + (["--judge"] if args.judge else []) + \
                (["--judge-model", args.judge_model]
                 if args.judge_model else []) + \
-               (["--judge-file", args.judge_file] if args.judge_file else [])
+               (["--judge-file", args.judge_file] if args.judge_file else []) + \
+               (["--model", args.model] if args.model else [])
     eval_main()
 
 
@@ -186,6 +187,8 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--judge", action="store_true")
     sp.add_argument("--judge-model", default=None)
     sp.add_argument("--judge-file", default=None)
+    sp.add_argument("--model", default=None,
+                    help="override generation model (e.g. qwen3.5:9b)")
     sp.set_defaults(func=cmd_eval)
 
     return p

@@ -1,29 +1,29 @@
 {
   "metrics": {
     "1": {
-      "hit@k": 0.6938775510204082,
-      "mrr@k": 0.6938775510204082,
-      "ndcg@k": 0.6938775510204082
+      "hit@k": 0.7346938775510204,
+      "mrr@k": 0.7346938775510204,
+      "ndcg@k": 0.7346938775510204
     },
     "3": {
-      "hit@k": 0.9387755102040817,
-      "mrr@k": 0.8129251700680272,
-      "ndcg@k": 0.8407377621010024
+      "hit@k": 0.9183673469387755,
+      "mrr@k": 0.8197278911564627,
+      "ndcg@k": 0.8386153493430912
     },
     "5": {
-      "hit@k": 0.9591836734693877,
-      "mrr@k": 0.8170068027210885,
-      "ndcg@k": 0.8540218627093111
+      "hit@k": 0.9387755102040817,
+      "mrr@k": 0.8238095238095237,
+      "ndcg@k": 0.8513510742411289
     },
     "10": {
-      "hit@k": 1.0,
-      "mrr@k": 0.8238095238095238,
-      "ndcg@k": 0.8685609315708631
+      "hit@k": 0.9795918367346939,
+      "mrr@k": 0.8301263362487851,
+      "ndcg@k": 0.8654233297603402
     },
     "20": {
-      "hit@k": 1.0,
-      "mrr@k": 0.8238095238095238,
-      "ndcg@k": 0.8685609315708631
+      "hit@k": 0.9795918367346939,
+      "mrr@k": 0.8301263362487851,
+      "ndcg@k": 0.8654233297603402
     }
   },
   "results": [
@@ -36,11 +36,12 @@
         "Biham & Shamir (1991) - Differential Cryptanalysis",
         "Matsui (1993) - Linear Cryptanalysis",
         "33_Kelsey_et_al_1998_PRNG_Cryptanalytic_Attacks.pdf",
-        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
         "20_Mouha_et_al_2011_MILP_Differential_Characteristics.pdf",
+        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
         "24_Biham_Biryukov_Shamir_1999_Impossible_Differential.pdf",
+        "80_NIST_SP_800_38A_Block_Cipher_Modes.pdf",
         "17_Todo_2015_Division_Property_Integral_Attacks.pdf",
-        "21_Bogdanov_et_al_2012_Zero_Correlation_Linear_Cryptanalysis.pdf"
+        "66_RFC5246_TLS_1_2.txt"
       ]
     },
     {
@@ -50,17 +51,17 @@
       ],
       "ranked_sources": [
         "Matsui (1993) - Linear Cryptanalysis",
-        "Biham & Shamir (1991) - Differential Cryptanalysis",
         "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf",
         "21_Bogdanov_et_al_2012_Zero_Correlation_Linear_Cryptanalysis.pdf",
         "20_Mouha_et_al_2011_MILP_Differential_Characteristics.pdf",
+        "Biham & Shamir (1991) - Differential Cryptanalysis",
         "33_Kelsey_et_al_1998_PRNG_Cryptanalytic_Attacks.pdf",
-        "16_Dinur_et_al_2015_Cube_Attacks_SIMON.pdf",
         "27_Courtois_Pieprzyk_2002_Algebraic_Cryptanalysis_AES.pdf",
+        "16_Dinur_et_al_2015_Cube_Attacks_SIMON.pdf",
         "17_Todo_2015_Division_Property_Integral_Attacks.pdf",
         "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
-        "56_Bernstein_2008_Salsa20_Family.pdf",
-        "13_Dinur_Shamir_2009_Cube_Attacks.pdf"
+        "25_Stevens_et_al_2017_SHA1_Collision_SHAttered.pdf",
+        "56_Bernstein_2008_Salsa20_Family.pdf"
       ]
     },
     {
@@ -70,14 +71,15 @@
       ],
       "ranked_sources": [
         "Matsui (1993) - Linear Cryptanalysis",
-        "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf",
         "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
+        "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf",
         "21_Bogdanov_et_al_2012_Zero_Correlation_Linear_Cryptanalysis.pdf",
-        "12_NIST_SP_800_22_Statistical_Tests_RNG.pdf",
+        "20_Mouha_et_al_2011_MILP_Differential_Characteristics.pdf",
         "18_Todo_Morii_2016_Bit_Based_Division_Property_SIMON.pdf",
-        "02_NIST_FIPS_197_AES_Specification.pdf",
+        "85_NIST_SP_800_90A_DRBG.pdf",
         "13_Dinur_Shamir_2009_Cube_Attacks.pdf",
-        "55_Bernstein_2008_ChaCha_Cipher.pdf"
+        "86_NIST_SP_800_90B_Entropy_Sources.pdf",
+        "02_NIST_FIPS_197_AES_Specification.pdf"
       ]
     },
     {
@@ -87,17 +89,14 @@
       ],
       "ranked_sources": [
         "Kocher et al. (1999) - Differential Power Analysis",
-        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
+        "78_NIST_FIPS_140_2_Crypto_Modules.pdf",
+        "88_NIST_SP_800_57_Key_Management.pdf",
         "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf",
-        "24_Biham_Biryukov_Shamir_1999_Impossible_Differential.pdf",
-        "Biham & Shamir (1991) - Differential Cryptanalysis",
-        "16_Dinur_et_al_2015_Cube_Attacks_SIMON.pdf",
-        "13_Dinur_Shamir_2009_Cube_Attacks.pdf",
-        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf",
-        "37_Bernstein_2005_Cache_Timing_Attacks_AES.pdf",
-        "33_Kelsey_et_al_1998_PRNG_Cryptanalytic_Attacks.pdf",
-        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
-        "20_Mouha_et_al_2011_MILP_Differential_Characteristics.pdf"
+        "90_NIST_SP_800_108_KDF.pdf",
+        "83_NIST_SP_800_38D_GCM.pdf",
+        "87_NIST_SP_800_56A_ECC_Key_Establishment.pdf",
+        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
+        "Biham & Shamir (1991) - Differential Cryptanalysis"
       ]
     },
     {
@@ -107,17 +106,14 @@
       ],
       "ranked_sources": [
         "Kocher et al. (1999) - Differential Power Analysis",
-        "Biham & Shamir (1991) - Differential Cryptanalysis",
-        "24_Biham_Biryukov_Shamir_1999_Impossible_Differential.pdf",
-        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
+        "78_NIST_FIPS_140_2_Crypto_Modules.pdf",
         "20_Mouha_et_al_2011_MILP_Differential_Characteristics.pdf",
-        "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf",
-        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
-        "12_NIST_SP_800_22_Statistical_Tests_RNG.pdf",
-        "33_Kelsey_et_al_1998_PRNG_Cryptanalytic_Attacks.pdf",
-        "54_Bernstein_2006_Curve25519.pdf",
-        "Matsui (1993) - Linear Cryptanalysis",
-        "27_Courtois_Pieprzyk_2002_Algebraic_Cryptanalysis_AES.pdf"
+        "24_Biham_Biryukov_Shamir_1999_Impossible_Differential.pdf",
+        "Biham & Shamir (1991) - Differential Cryptanalysis",
+        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
+        "85_NIST_SP_800_90A_DRBG.pdf",
+        "88_NIST_SP_800_57_Key_Management.pdf",
+        "83_NIST_SP_800_38D_GCM.pdf"
       ]
     },
     {
@@ -127,18 +123,9 @@
       ],
       "ranked_sources": [
         "Bleichenbacher (1998) - PKCS#1 Padding Oracle",
+        "60_RFC8017_RSA_PKCS1.txt",
         "Vaudenay (2002) - CBC Padding Oracle",
-        "Coppersmith (1996) - Lattice RSA Attacks",
-        "01_RFC8446_TLS_1_3_Specification.txt",
-        "27_Courtois_Pieprzyk_2002_Algebraic_Cryptanalysis_AES.pdf",
-        "33_Kelsey_et_al_1998_PRNG_Cryptanalytic_Attacks.pdf",
-        "03_NIST_FIPS_180_4_SHA2_Standard.pdf",
-        "12_NIST_SP_800_22_Statistical_Tests_RNG.pdf",
-        "25_Stevens_et_al_2017_SHA1_Collision_SHAttered.pdf",
-        "59_Regev_2005_Learning_With_Errors_LWE.pdf",
-        "04_NIST_FIPS_202_SHA3_Standard.pdf",
-        "37_Bernstein_2005_Cache_Timing_Attacks_AES.pdf",
-        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf"
+        "66_RFC5246_TLS_1_2.txt"
       ]
     },
     {
@@ -149,8 +136,11 @@
       ],
       "ranked_sources": [
         "01_RFC8446_TLS_1_3_Specification.txt",
+        "66_RFC5246_TLS_1_2.txt",
         "Bleichenbacher (1998) - PKCS#1 Padding Oracle",
-        "54_Bernstein_2006_Curve25519.pdf"
+        "92_NIST_SP_800_133_Key_Generation.pdf",
+        "86_NIST_SP_800_90B_Entropy_Sources.pdf",
+        "60_RFC8017_RSA_PKCS1.txt"
       ]
     },
     {
@@ -161,15 +151,15 @@
       "ranked_sources": [
         "Coppersmith (1996) - Lattice RSA Attacks",
         "47_Rivest_Shamir_Adleman_1978_RSA_Cryptosystem.pdf",
-        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf",
-        "13_Dinur_Shamir_2009_Cube_Attacks.pdf",
         "06_NIST_FIPS_203_ML_KEM_Kyber_Standard.pdf",
-        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
-        "27_Courtois_Pieprzyk_2002_Algebraic_Cryptanalysis_AES.pdf",
+        "85_NIST_SP_800_90A_DRBG.pdf",
+        "13_Dinur_Shamir_2009_Cube_Attacks.pdf",
         "54_Bernstein_2006_Curve25519.pdf",
-        "37_Bernstein_2005_Cache_Timing_Attacks_AES.pdf",
-        "04_NIST_FIPS_202_SHA3_Standard.pdf",
-        "02_NIST_FIPS_197_AES_Specification.pdf"
+        "68_RFC6090_Fundamental_ECC.txt",
+        "27_Courtois_Pieprzyk_2002_Algebraic_Cryptanalysis_AES.pdf",
+        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
+        "81_NIST_SP_800_38B_CMAC.pdf",
+        "37_Bernstein_2005_Cache_Timing_Attacks_AES.pdf"
       ]
     },
     {
@@ -178,15 +168,11 @@
         "Coppersmith (1996) - Lattice RSA Attacks"
       ],
       "ranked_sources": [
-        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
         "Coppersmith (1996) - Lattice RSA Attacks",
-        "33_Kelsey_et_al_1998_PRNG_Cryptanalytic_Attacks.pdf",
-        "08_NIST_FIPS_205_SLH_DSA_SPHINCS_Standard.pdf",
-        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf",
-        "Bleichenbacher (1998) - PKCS#1 Padding Oracle",
-        "50_Bellare_Rogaway_1993_Random_Oracles.pdf",
-        "47_Rivest_Shamir_Adleman_1978_RSA_Cryptosystem.pdf",
-        "25_Stevens_et_al_2017_SHA1_Collision_SHAttered.pdf"
+        "60_RFC8017_RSA_PKCS1.txt",
+        "88_NIST_SP_800_57_Key_Management.pdf",
+        "87_NIST_SP_800_56A_ECC_Key_Establishment.pdf",
+        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf"
       ]
     },
     {
@@ -197,10 +183,12 @@
       "ranked_sources": [
         "26_Wang_Yu_2005_MD5_Collisions.pdf",
         "Wang et al. (2005) - MD5 & SHA-1 Collisions",
+        "60_RFC8017_RSA_PKCS1.txt",
         "25_Stevens_et_al_2017_SHA1_Collision_SHAttered.pdf",
         "11_RFC2104_HMAC_Keyed_Hashing.txt",
+        "88_NIST_SP_800_57_Key_Management.pdf",
         "03_NIST_FIPS_180_4_SHA2_Standard.pdf",
-        "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf"
+        "89_NIST_SP_800_107_Hash_Usage.pdf"
       ]
     },
     {
@@ -210,17 +198,13 @@
       ],
       "ranked_sources": [
         "Vaudenay (2002) - CBC Padding Oracle",
-        "56_Bernstein_2008_Salsa20_Family.pdf",
-        "52_Cramer_Shoup_1998_CCA_Secure_Public_Key.pdf",
-        "06_NIST_FIPS_203_ML_KEM_Kyber_Standard.pdf",
         "Bleichenbacher (1998) - PKCS#1 Padding Oracle",
-        "01_RFC8446_TLS_1_3_Specification.txt",
-        "09_RFC8439_ChaCha20_Poly1305.txt",
-        "50_Bellare_Rogaway_1993_Random_Oracles.pdf",
-        "59_Regev_2005_Learning_With_Errors_LWE.pdf",
-        "08_NIST_FIPS_205_SLH_DSA_SPHINCS_Standard.pdf",
-        "03_NIST_FIPS_180_4_SHA2_Standard.pdf",
-        "37_Bernstein_2005_Cache_Timing_Attacks_AES.pdf"
+        "80_NIST_SP_800_38A_Block_Cipher_Modes.pdf",
+        "76_RFC7518_JOSE_Algorithms.txt",
+        "64_RFC4253_SSH_Transport.txt",
+        "87_NIST_SP_800_56A_ECC_Key_Establishment.pdf",
+        "66_RFC5246_TLS_1_2.txt",
+        "56_Bernstein_2008_Salsa20_Family.pdf"
       ]
     },
     {
@@ -229,13 +213,14 @@
         "Vaudenay (2002) - CBC Padding Oracle"
       ],
       "ranked_sources": [
-        "01_RFC8446_TLS_1_3_Specification.txt",
-        "02_NIST_FIPS_197_AES_Specification.pdf",
-        "09_RFC8439_ChaCha20_Poly1305.txt",
-        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
-        "56_Bernstein_2008_Salsa20_Family.pdf",
         "Vaudenay (2002) - CBC Padding Oracle",
-        "18_Todo_Morii_2016_Bit_Based_Division_Property_SIMON.pdf"
+        "70_RFC5116_AEAD.txt",
+        "80_NIST_SP_800_38A_Block_Cipher_Modes.pdf",
+        "64_RFC4253_SSH_Transport.txt",
+        "76_RFC7518_JOSE_Algorithms.txt",
+        "66_RFC5246_TLS_1_2.txt",
+        "63_RFC9180_HPKE.txt",
+        "81_NIST_SP_800_38B_CMAC.pdf"
       ]
     },
     {
@@ -244,11 +229,15 @@
         "02_NIST_FIPS_197_AES_Specification.pdf"
       ],
       "ranked_sources": [
-        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
+        "88_NIST_SP_800_57_Key_Management.pdf",
+        "83_NIST_SP_800_38D_GCM.pdf",
+        "66_RFC5246_TLS_1_2.txt",
+        "81_NIST_SP_800_38B_CMAC.pdf",
         "02_NIST_FIPS_197_AES_Specification.pdf",
-        "28_Biryukov_Khovratovich_2009_Related_Key_AES.pdf",
         "12_NIST_SP_800_22_Statistical_Tests_RNG.pdf",
-        "16_Dinur_et_al_2015_Cube_Attacks_SIMON.pdf"
+        "80_NIST_SP_800_38A_Block_Cipher_Modes.pdf",
+        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
+        "84_NIST_SP_800_38E_XTS_AES.pdf"
       ]
     },
     {
@@ -261,11 +250,13 @@
         "20_Mouha_et_al_2011_MILP_Differential_Characteristics.pdf",
         "Biham & Shamir (1991) - Differential Cryptanalysis",
         "28_Biryukov_Khovratovich_2009_Related_Key_AES.pdf",
+        "24_Biham_Biryukov_Shamir_1999_Impossible_Differential.pdf",
         "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
         "37_Bernstein_2005_Cache_Timing_Attacks_AES.pdf",
         "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf",
         "27_Courtois_Pieprzyk_2002_Algebraic_Cryptanalysis_AES.pdf",
-        "Kocher et al. (1999) - Differential Power Analysis"
+        "Kocher et al. (1999) - Differential Power Analysis",
+        "69_RFC4493_AES_CMAC.txt"
       ]
     },
     {
@@ -275,10 +266,13 @@
       ],
       "ranked_sources": [
         "28_Biryukov_Khovratovich_2009_Related_Key_AES.pdf",
+        "24_Biham_Biryukov_Shamir_1999_Impossible_Differential.pdf",
         "22_Wagner_1999_Boomerang_Attack.txt",
         "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf",
+        "Biham & Shamir (1991) - Differential Cryptanalysis",
         "16_Dinur_et_al_2015_Cube_Attacks_SIMON.pdf",
-        "33_Kelsey_et_al_1998_PRNG_Cryptanalytic_Attacks.pdf"
+        "33_Kelsey_et_al_1998_PRNG_Cryptanalytic_Attacks.pdf",
+        "25_Stevens_et_al_2017_SHA1_Collision_SHAttered.pdf"
       ]
     },
     {
@@ -290,14 +284,15 @@
         "24_Biham_Biryukov_Shamir_1999_Impossible_Differential.pdf",
         "Biham & Shamir (1991) - Differential Cryptanalysis",
         "33_Kelsey_et_al_1998_PRNG_Cryptanalytic_Attacks.pdf",
-        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
         "20_Mouha_et_al_2011_MILP_Differential_Characteristics.pdf",
+        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
         "21_Bogdanov_et_al_2012_Zero_Correlation_Linear_Cryptanalysis.pdf",
         "56_Bernstein_2008_Salsa20_Family.pdf",
-        "46_Diffie_Hellman_1976_New_Directions_in_Cryptography.pdf",
-        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
         "Matsui (1993) - Linear Cryptanalysis",
-        "16_Dinur_et_al_2015_Cube_Attacks_SIMON.pdf"
+        "78_NIST_FIPS_140_2_Crypto_Modules.pdf",
+        "88_NIST_SP_800_57_Key_Management.pdf",
+        "46_Diffie_Hellman_1976_New_Directions_in_Cryptography.pdf",
+        "Kocher et al. (1999) - Differential Power Analysis"
       ]
     },
     {
@@ -310,9 +305,11 @@
         "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf",
         "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
         "37_Bernstein_2005_Cache_Timing_Attacks_AES.pdf",
+        "Biham & Shamir (1991) - Differential Cryptanalysis",
+        "69_RFC4493_AES_CMAC.txt",
         "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
-        "12_NIST_SP_800_22_Statistical_Tests_RNG.pdf",
-        "28_Biryukov_Khovratovich_2009_Related_Key_AES.pdf"
+        "28_Biryukov_Khovratovich_2009_Related_Key_AES.pdf",
+        "Kocher et al. (1999) - Differential Power Analysis"
       ]
     },
     {
@@ -323,8 +320,8 @@
       "ranked_sources": [
         "20_Mouha_et_al_2011_MILP_Differential_Characteristics.pdf",
         "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf",
+        "Matsui (1993) - Linear Cryptanalysis",
         "21_Bogdanov_et_al_2012_Zero_Correlation_Linear_Cryptanalysis.pdf",
-        "24_Biham_Biryukov_Shamir_1999_Impossible_Differential.pdf",
         "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf"
       ]
     },
@@ -334,7 +331,9 @@
         "21_Bogdanov_et_al_2012_Zero_Correlation_Linear_Cryptanalysis.pdf"
       ],
       "ranked_sources": [
-        "21_Bogdanov_et_al_2012_Zero_Correlation_Linear_Cryptanalysis.pdf"
+        "21_Bogdanov_et_al_2012_Zero_Correlation_Linear_Cryptanalysis.pdf",
+        "Matsui (1993) - Linear Cryptanalysis",
+        "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf"
       ]
     },
     {
@@ -345,7 +344,8 @@
       "ranked_sources": [
         "16_Dinur_et_al_2015_Cube_Attacks_SIMON.pdf",
         "13_Dinur_Shamir_2009_Cube_Attacks.pdf",
-        "33_Kelsey_et_al_1998_PRNG_Cryptanalytic_Attacks.pdf"
+        "33_Kelsey_et_al_1998_PRNG_Cryptanalytic_Attacks.pdf",
+        "78_NIST_FIPS_140_2_Crypto_Modules.pdf"
       ]
     },
     {
@@ -364,12 +364,14 @@
       ],
       "ranked_sources": [
         "28_Biryukov_Khovratovich_2009_Related_Key_AES.pdf",
-        "37_Bernstein_2005_Cache_Timing_Attacks_AES.pdf",
         "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf",
+        "37_Bernstein_2005_Cache_Timing_Attacks_AES.pdf",
         "21_Bogdanov_et_al_2012_Zero_Correlation_Linear_Cryptanalysis.pdf",
-        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
-        "02_NIST_FIPS_197_AES_Specification.pdf",
-        "04_NIST_FIPS_202_SHA3_Standard.pdf"
+        "88_NIST_SP_800_57_Key_Management.pdf",
+        "04_NIST_FIPS_202_SHA3_Standard.pdf",
+        "66_RFC5246_TLS_1_2.txt",
+        "91_NIST_SP_800_131A_Transition.pdf",
+        "33_Kelsey_et_al_1998_PRNG_Cryptanalytic_Attacks.pdf"
       ]
     },
     {
@@ -382,9 +384,15 @@
         "16_Dinur_et_al_2015_Cube_Attacks_SIMON.pdf",
         "28_Biryukov_Khovratovich_2009_Related_Key_AES.pdf",
         "02_NIST_FIPS_197_AES_Specification.pdf",
-        "55_Bernstein_2008_ChaCha_Cipher.pdf",
+        "91_NIST_SP_800_131A_Transition.pdf",
+        "69_RFC4493_AES_CMAC.txt",
         "27_Courtois_Pieprzyk_2002_Algebraic_Cryptanalysis_AES.pdf",
-        "09_RFC8439_ChaCha20_Poly1305.txt"
+        "66_RFC5246_TLS_1_2.txt",
+        "Kocher et al. (1999) - Differential Power Analysis",
+        "55_Bernstein_2008_ChaCha_Cipher.pdf",
+        "76_RFC7518_JOSE_Algorithms.txt",
+        "09_RFC8439_ChaCha20_Poly1305.txt",
+        "82_NIST_SP_800_38C_CCM.pdf"
       ]
     },
     {
@@ -407,9 +415,11 @@
       "ranked_sources": [
         "Wang et al. (2005) - MD5 & SHA-1 Collisions",
         "25_Stevens_et_al_2017_SHA1_Collision_SHAttered.pdf",
+        "60_RFC8017_RSA_PKCS1.txt",
         "26_Wang_Yu_2005_MD5_Collisions.pdf",
-        "03_NIST_FIPS_180_4_SHA2_Standard.pdf",
-        "04_NIST_FIPS_202_SHA3_Standard.pdf"
+        "89_NIST_SP_800_107_Hash_Usage.pdf",
+        "88_NIST_SP_800_57_Key_Management.pdf",
+        "03_NIST_FIPS_180_4_SHA2_Standard.pdf"
       ]
     },
     {
@@ -418,13 +428,12 @@
         "26_Wang_Yu_2005_MD5_Collisions.pdf"
       ],
       "ranked_sources": [
-        "Wang et al. (2005) - MD5 & SHA-1 Collisions",
         "26_Wang_Yu_2005_MD5_Collisions.pdf",
+        "Wang et al. (2005) - MD5 & SHA-1 Collisions",
+        "60_RFC8017_RSA_PKCS1.txt",
         "25_Stevens_et_al_2017_SHA1_Collision_SHAttered.pdf",
         "55_Bernstein_2008_ChaCha_Cipher.pdf",
-        "11_RFC2104_HMAC_Keyed_Hashing.txt",
-        "03_NIST_FIPS_180_4_SHA2_Standard.pdf",
-        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf"
+        "11_RFC2104_HMAC_Keyed_Hashing.txt"
       ]
     },
     {
@@ -433,9 +442,14 @@
         "11_RFC2104_HMAC_Keyed_Hashing.txt"
       ],
       "ranked_sources": [
+        "89_NIST_SP_800_107_Hash_Usage.pdf",
         "11_RFC2104_HMAC_Keyed_Hashing.txt",
-        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
-        "01_RFC8446_TLS_1_3_Specification.txt"
+        "67_RFC6979_Deterministic_ECDSA.txt",
+        "76_RFC7518_JOSE_Algorithms.txt",
+        "64_RFC4253_SSH_Transport.txt",
+        "73_RFC7296_IKEv2.txt",
+        "62_RFC5869_HKDF.txt",
+        "85_NIST_SP_800_90A_DRBG.pdf"
       ]
     },
     {
@@ -445,7 +459,8 @@
       ],
       "ranked_sources": [
         "09_RFC8439_ChaCha20_Poly1305.txt",
-        "01_RFC8446_TLS_1_3_Specification.txt"
+        "75_RFC8613_OSCORE.txt",
+        "70_RFC5116_AEAD.txt"
       ]
     },
     {
@@ -455,9 +470,9 @@
       ],
       "ranked_sources": [
         "10_RFC7748_Elliptic_Curves_Curve25519.txt",
-        "53_Koblitz_1987_Elliptic_Curve_Cryptosystems.pdf",
-        "01_RFC8446_TLS_1_3_Specification.txt",
-        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf"
+        "94_NIST_SP_800_186_ECC_Groups.pdf",
+        "87_NIST_SP_800_56A_ECC_Key_Establishment.pdf",
+        "91_NIST_SP_800_131A_Transition.pdf"
       ]
     },
     {
@@ -467,9 +482,14 @@
       ],
       "ranked_sources": [
         "54_Bernstein_2006_Curve25519.pdf",
+        "61_RFC8032_EdDSA_Ed25519_Ed448.txt",
         "10_RFC7748_Elliptic_Curves_Curve25519.txt",
-        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
-        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf"
+        "94_NIST_SP_800_186_ECC_Groups.pdf",
+        "85_NIST_SP_800_90A_DRBG.pdf",
+        "16_Dinur_et_al_2015_Cube_Attacks_SIMON.pdf",
+        "87_NIST_SP_800_56A_ECC_Key_Establishment.pdf",
+        "66_RFC5246_TLS_1_2.txt",
+        "37_Bernstein_2005_Cache_Timing_Attacks_AES.pdf"
       ]
     },
     {
@@ -479,7 +499,9 @@
       ],
       "ranked_sources": [
         "04_NIST_FIPS_202_SHA3_Standard.pdf",
-        "25_Stevens_et_al_2017_SHA1_Collision_SHAttered.pdf",
+        "91_NIST_SP_800_131A_Transition.pdf",
+        "93_NIST_SP_800_185_SHA3_Derived.pdf",
+        "88_NIST_SP_800_57_Key_Management.pdf",
         "03_NIST_FIPS_180_4_SHA2_Standard.pdf"
       ]
     },
@@ -490,9 +512,13 @@
       ],
       "ranked_sources": [
         "25_Stevens_et_al_2017_SHA1_Collision_SHAttered.pdf",
+        "89_NIST_SP_800_107_Hash_Usage.pdf",
         "03_NIST_FIPS_180_4_SHA2_Standard.pdf",
-        "04_NIST_FIPS_202_SHA3_Standard.pdf",
-        "26_Wang_Yu_2005_MD5_Collisions.pdf"
+        "88_NIST_SP_800_57_Key_Management.pdf",
+        "26_Wang_Yu_2005_MD5_Collisions.pdf",
+        "71_RFC7693_BLAKE2.txt",
+        "80_NIST_SP_800_38A_Block_Cipher_Modes.pdf",
+        "67_RFC6979_Deterministic_ECDSA.txt"
       ]
     },
     {
@@ -502,8 +528,11 @@
       ],
       "ranked_sources": [
         "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
+        "91_NIST_SP_800_131A_Transition.pdf",
+        "87_NIST_SP_800_56A_ECC_Key_Establishment.pdf",
         "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf",
-        "01_RFC8446_TLS_1_3_Specification.txt",
+        "68_RFC6090_Fundamental_ECC.txt",
+        "67_RFC6979_Deterministic_ECDSA.txt",
         "08_NIST_FIPS_205_SLH_DSA_SPHINCS_Standard.pdf"
       ]
     },
@@ -513,7 +542,8 @@
         "06_NIST_FIPS_203_ML_KEM_Kyber_Standard.pdf"
       ],
       "ranked_sources": [
-        "06_NIST_FIPS_203_ML_KEM_Kyber_Standard.pdf"
+        "06_NIST_FIPS_203_ML_KEM_Kyber_Standard.pdf",
+        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf"
       ]
     },
     {
@@ -523,7 +553,8 @@
       ],
       "ranked_sources": [
         "06_NIST_FIPS_203_ML_KEM_Kyber_Standard.pdf",
-        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf"
+        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf",
+        "95_NIST_SP_800_208_Stateful_HBS.pdf"
       ]
     },
     {
@@ -550,13 +581,14 @@
         "12_NIST_SP_800_22_Statistical_Tests_RNG.pdf"
       ],
       "ranked_sources": [
-        "32_Marsaglia_1995_Diehard_Randomness_Tests.pdf",
         "12_NIST_SP_800_22_Statistical_Tests_RNG.pdf",
-        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
-        "06_NIST_FIPS_203_ML_KEM_Kyber_Standard.pdf",
-        "08_NIST_FIPS_205_SLH_DSA_SPHINCS_Standard.pdf",
-        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf",
-        "03_NIST_FIPS_180_4_SHA2_Standard.pdf"
+        "32_Marsaglia_1995_Diehard_Randomness_Tests.pdf",
+        "89_NIST_SP_800_107_Hash_Usage.pdf",
+        "92_NIST_SP_800_133_Key_Generation.pdf",
+        "87_NIST_SP_800_56A_ECC_Key_Establishment.pdf",
+        "94_NIST_SP_800_186_ECC_Groups.pdf",
+        "91_NIST_SP_800_131A_Transition.pdf",
+        "88_NIST_SP_800_57_Key_Management.pdf"
       ]
     },
     {
@@ -567,8 +599,9 @@
       "ranked_sources": [
         "32_Marsaglia_1995_Diehard_Randomness_Tests.pdf",
         "12_NIST_SP_800_22_Statistical_Tests_RNG.pdf",
+        "86_NIST_SP_800_90B_Entropy_Sources.pdf",
         "27_Courtois_Pieprzyk_2002_Algebraic_Cryptanalysis_AES.pdf",
-        "33_Kelsey_et_al_1998_PRNG_Cryptanalytic_Attacks.pdf"
+        "78_NIST_FIPS_140_2_Crypto_Modules.pdf"
       ]
     },
     {
@@ -578,10 +611,11 @@
       ],
       "ranked_sources": [
         "33_Kelsey_et_al_1998_PRNG_Cryptanalytic_Attacks.pdf",
-        "25_Stevens_et_al_2017_SHA1_Collision_SHAttered.pdf",
-        "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf",
+        "75_RFC8613_OSCORE.txt",
         "08_NIST_FIPS_205_SLH_DSA_SPHINCS_Standard.pdf",
-        "26_Wang_Yu_2005_MD5_Collisions.pdf"
+        "19_Sun_et_al_2014_MILP_Differential_Linear_Cryptanalysis.pdf",
+        "78_NIST_FIPS_140_2_Crypto_Modules.pdf",
+        "73_RFC7296_IKEv2.txt"
       ]
     },
     {
@@ -590,9 +624,13 @@
         "46_Diffie_Hellman_1976_New_Directions_in_Cryptography.pdf"
       ],
       "ranked_sources": [
+        "73_RFC7296_IKEv2.txt",
+        "64_RFC4253_SSH_Transport.txt",
+        "66_RFC5246_TLS_1_2.txt",
+        "63_RFC9180_HPKE.txt",
+        "87_NIST_SP_800_56A_ECC_Key_Establishment.pdf",
         "01_RFC8446_TLS_1_3_Specification.txt",
-        "10_RFC7748_Elliptic_Curves_Curve25519.txt",
-        "46_Diffie_Hellman_1976_New_Directions_in_Cryptography.pdf"
+        "62_RFC5869_HKDF.txt"
       ]
     },
     {
@@ -601,14 +639,14 @@
         "47_Rivest_Shamir_Adleman_1978_RSA_Cryptosystem.pdf"
       ],
       "ranked_sources": [
+        "60_RFC8017_RSA_PKCS1.txt",
         "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
-        "06_NIST_FIPS_203_ML_KEM_Kyber_Standard.pdf",
-        "Bleichenbacher (1998) - PKCS#1 Padding Oracle",
-        "08_NIST_FIPS_205_SLH_DSA_SPHINCS_Standard.pdf",
+        "92_NIST_SP_800_133_Key_Generation.pdf",
+        "66_RFC5246_TLS_1_2.txt",
+        "91_NIST_SP_800_131A_Transition.pdf",
         "47_Rivest_Shamir_Adleman_1978_RSA_Cryptosystem.pdf",
-        "59_Regev_2005_Learning_With_Errors_LWE.pdf",
-        "50_Bellare_Rogaway_1993_Random_Oracles.pdf",
-        "02_NIST_FIPS_197_AES_Specification.pdf"
+        "74_RFC5652_CMS.txt",
+        "88_NIST_SP_800_57_Key_Management.pdf"
       ]
     },
     {
@@ -619,11 +657,12 @@
       "ranked_sources": [
         "49_Goldwasser_Micali_Rackoff_1989_Zero_Knowledge.pdf",
         "50_Bellare_Rogaway_1993_Random_Oracles.pdf",
-        "46_Diffie_Hellman_1976_New_Directions_in_Cryptography.pdf",
         "21_Bogdanov_et_al_2012_Zero_Correlation_Linear_Cryptanalysis.pdf",
         "12_NIST_SP_800_22_Statistical_Tests_RNG.pdf",
+        "92_NIST_SP_800_133_Key_Generation.pdf",
         "17_Todo_2015_Division_Property_Integral_Attacks.pdf",
-        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf"
+        "86_NIST_SP_800_90B_Entropy_Sources.pdf",
+        "75_RFC8613_OSCORE.txt"
       ]
     },
     {
@@ -632,7 +671,8 @@
         "50_Bellare_Rogaway_1993_Random_Oracles.pdf"
       ],
       "ranked_sources": [
-        "50_Bellare_Rogaway_1993_Random_Oracles.pdf"
+        "50_Bellare_Rogaway_1993_Random_Oracles.pdf",
+        "95_NIST_SP_800_208_Stateful_HBS.pdf"
       ]
     },
     {
@@ -642,17 +682,20 @@
       ],
       "ranked_sources": [
         "52_Cramer_Shoup_1998_CCA_Secure_Public_Key.pdf",
+        "63_RFC9180_HPKE.txt",
+        "60_RFC8017_RSA_PKCS1.txt",
         "46_Diffie_Hellman_1976_New_Directions_in_Cryptography.pdf",
-        "03_NIST_FIPS_180_4_SHA2_Standard.pdf",
-        "50_Bellare_Rogaway_1993_Random_Oracles.pdf",
-        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
         "54_Bernstein_2006_Curve25519.pdf",
+        "82_NIST_SP_800_38C_CCM.pdf",
         "47_Rivest_Shamir_Adleman_1978_RSA_Cryptosystem.pdf",
+        "03_NIST_FIPS_180_4_SHA2_Standard.pdf",
+        "67_RFC6979_Deterministic_ECDSA.txt",
+        "85_NIST_SP_800_90A_DRBG.pdf",
         "04_NIST_FIPS_202_SHA3_Standard.pdf",
-        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf",
+        "78_NIST_FIPS_140_2_Crypto_Modules.pdf",
         "25_Stevens_et_al_2017_SHA1_Collision_SHAttered.pdf",
-        "09_RFC8439_ChaCha20_Poly1305.txt",
-        "18_Todo_Morii_2016_Bit_Based_Division_Property_SIMON.pdf"
+        "91_NIST_SP_800_131A_Transition.pdf",
+        "66_RFC5246_TLS_1_2.txt"
       ]
     },
     {
@@ -661,10 +704,12 @@
         "53_Koblitz_1987_Elliptic_Curve_Cryptosystems.pdf"
       ],
       "ranked_sources": [
+        "94_NIST_SP_800_186_ECC_Groups.pdf",
         "53_Koblitz_1987_Elliptic_Curve_Cryptosystems.pdf",
+        "87_NIST_SP_800_56A_ECC_Key_Establishment.pdf",
         "10_RFC7748_Elliptic_Curves_Curve25519.txt",
-        "05_NIST_FIPS_186_5_Digital_Signature_Standard.pdf",
-        "54_Bernstein_2006_Curve25519.pdf"
+        "68_RFC6090_Fundamental_ECC.txt",
+        "67_RFC6979_Deterministic_ECDSA.txt"
       ]
     },
     {
@@ -675,9 +720,10 @@
       "ranked_sources": [
         "55_Bernstein_2008_ChaCha_Cipher.pdf",
         "09_RFC8439_ChaCha20_Poly1305.txt",
+        "82_NIST_SP_800_38C_CCM.pdf",
         "56_Bernstein_2008_Salsa20_Family.pdf",
         "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf",
-        "33_Kelsey_et_al_1998_PRNG_Cryptanalytic_Attacks.pdf"
+        "80_NIST_SP_800_38A_Block_Cipher_Modes.pdf"
       ]
     },
     {
@@ -688,10 +734,10 @@
       "ranked_sources": [
         "56_Bernstein_2008_Salsa20_Family.pdf",
         "55_Bernstein_2008_ChaCha_Cipher.pdf",
+        "90_NIST_SP_800_108_KDF.pdf",
         "13_Dinur_Shamir_2009_Cube_Attacks.pdf",
         "16_Dinur_et_al_2015_Cube_Attacks_SIMON.pdf",
-        "09_RFC8439_ChaCha20_Poly1305.txt",
-        "30_Daemen_Rijmen_1999_Rijndael_AES_Proposal.pdf"
+        "09_RFC8439_ChaCha20_Poly1305.txt"
       ]
     },
     {
@@ -702,7 +748,8 @@
       "ranked_sources": [
         "59_Regev_2005_Learning_With_Errors_LWE.pdf",
         "06_NIST_FIPS_203_ML_KEM_Kyber_Standard.pdf",
-        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf"
+        "07_NIST_FIPS_204_ML_DSA_Dilithium_Standard.pdf",
+        "88_NIST_SP_800_57_Key_Management.pdf"
       ]
     }
   ]

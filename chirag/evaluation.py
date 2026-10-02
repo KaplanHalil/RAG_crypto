@@ -194,8 +194,10 @@ def run_answer_eval(pipeline: RAGPipeline, items: List[QAItem], limit: int,
                 break
             print(f"[answer-eval]  retry {attempt + 1} for empty answer",
                   flush=True)
+        src_id = {s["source"]: s["id"] for s in resp["sources"]}
         ctx = "\n\n".join(
-            f"--- {c['metadata']['source']} ---\n{c['content']}"
+            f"--- SOURCE {src_id.get(c['metadata']['source'], '?'):>2}: "
+            f"{c['metadata']['source']} ---\n{c['content']}"
             for c in resp["retrieved_chunks"])
         entry = {"question": item.question, "answer": answer,
                  "retrieved_sources": [s["source"] for s in resp["sources"]],
@@ -262,12 +264,18 @@ def main() -> None:
     ap.add_argument("--judge-file", default=None,
                     help="score the answers in an existing answer_eval.json "
                          "without regenerating them (separate pass)")
+    ap.add_argument("--model", default=None,
+                    help="override the generation model (any model from "
+                         "chirag.json, e.g. qwen3.5:9b)")
     args = ap.parse_args()
 
     settings: Settings = get_settings()
     provider = build_embedding_provider(settings)
     store = VectorStore(settings, provider)
     llm = build_llm_provider(settings)
+    if args.model:
+        from .models import build_llm
+        llm = build_llm(args.model)
     pipeline = RAGPipeline(settings, store, provider, llm)
 
     items = load_benchmark(args.benchmark)
