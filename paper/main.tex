@@ -14,7 +14,7 @@
 \usepackage{microtype}
 \usepackage{xcolor}
 \usepackage{tikz}
-\usetikzlibrary{positioning, arrows.meta, fit, backgrounds}
+\usetikzlibrary{positioning, arrows.meta, fit, backgrounds, shadows}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
 
@@ -202,34 +202,76 @@ ablation or for a different deployment.
 
 \begin{figure}[t]
 \centering
+\resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[
-  box/.style={draw, rounded corners=4pt, fill=blue!8, minimum height=8mm,
-              align=center, font=\small},
-  line/.style={-{Stealth[length=3mm]}, thick},
-  node distance=4mm and 10mm]
-  \node[box] (kb) {Knowledge base\\82 docs, $\sim$8.1k chunks};
-  \node[box, right=of kb] (seg) {Chunker\\paragraph-aware overlap};
-  \node[box, right=of seg] (vs) {Vector store\\ChromaDB, cosine};
-  \node[box, above=6mm of vs] (em) {Embeddings\\nomic-embed-text};
-  \node[box, below=of kb] (q) {Question};
-  \node[box, right=of q] (dr) {Dense retrieval};
-  \node[box, below=10mm of dr] (lex) {Lexical BM25};
-  \node[box, right=of dr, xshift=4mm] (rrf) {RRF fusion};
-  \node[box, right=of rrf] (gen) {Generator\\qwen3.5:9b / gemma4:26b};
-  \node[box, right=of gen] (ans) {Cited answer\\ (sources cited)};
-  \draw[line] (kb)--(seg);
-  \draw[line] (seg)--(vs);
-  \draw[line] (em)--(vs);
-  \draw[line] (q)--(dr);
-  \draw[line] (dr)--(rrf);
-  \draw[line] (lex)--(rrf);
-  \draw[line] (vs.north east) to[out=0,in=180] (dr.south east);
-  \draw[line] (vs.east) to[out=0,in=180] (lex.west);
-  \draw[line] (rrf)--(gen);
-  \draw[line] (gen)--(ans);
-\end{tikzpicture}
-\caption{Chirag architecture. The same embedding provider serves indexing
-and querying; retrieval fuses dense and lexical rankings before generation.}
+    font=\small,
+    base/.style={rounded corners=5pt, minimum height=8.5mm, align=center,
+                 text width=2.55cm, inner sep=2mm,
+                 drop shadow={shadow xshift=1.2pt, shadow yshift=-1.2pt,
+                              fill=black!25}},
+    src/.style={base, draw=gray!60,  fill=gray!12},
+    proc/.style={base, draw=blue!55, fill=blue!8},
+    idx/.style={base, draw=teal!50,  fill=teal!8},
+    ret/.style={base, draw=violet!55, fill=violet!8},
+    gen/.style={base, draw=green!50!black!60, fill=green!8},
+    result/.style={base, draw=orange!75, fill=orange!12},
+    line/.style={-{Stealth[length=3mm, width=2.5mm]}, thick, draw=black!70},
+    queryline/.style={-{Stealth[length=3mm, width=2.5mm]}, thick,
+                      dashed, draw=violet!50!black},
+    lab/.style={font=\scriptsize, fill=white, inner sep=1.5pt,
+                text=black!80, anchor=center},
+    phase/.style={rounded corners=8pt, draw=black!22, line width=1.2pt},
+    phaselabel/.style={font=\footnotesize\bfseries, fill=white,
+                       text=black!70, inner sep=2pt},
+  ]
+  % ---- Offline: indexing ----
+  \node[src]  (kb)    at (0,0)    {\textbf{Knowledge base}\\82 documents\\$\sim$8.1k chunks};
+  \node[proc] (chunk) at (4.6,0)  {\textbf{Chunker}\\paragraph-aware\\overlap};
+  \node[idx]  (vs)    at (9.2,0)  {\textbf{Vector store}\\ChromaDB, cosine};
+  \node[idx]  (emb)   at (9.2,2.3){\textbf{Embedding model}\\nomic-embed-text\\768-dim};
+  % ---- Online: query ----
+  \node[result] (q)   at (0,-5.6) {\textbf{Question}\\[0.4mm]query};
+  \node[ret]  (dr)    at (4.6,-4.4){\textbf{Dense retrieval}\\vector similarity};
+  \node[ret]  (lex)   at (4.6,-6.8){\textbf{Lexical retrieval}\\Okapi-BM25};
+  \node[proc] (rrf)   at (8.5,-5.6){\textbf{RRF fusion}\\reciprocal-rank};
+  \node[gen]  (gen)   at (12.8,-5.6){\textbf{Generator}\\qwen3.5:9b\\gemma4:26b};
+  \node[result] (ans) at (17.1,-5.6){\textbf{Cited answer}\\grounded + sources};
+  % ---- arrows: offline (plain = data flow) ----
+  \draw[line] (kb.east) -- (chunk.west)
+      node[lab, above] {documents};
+  \draw[line] (chunk.east) -- (vs.west)
+      node[lab, above] {chunks};
+  \draw[line] (emb.south) -- (vs.north)
+      node[lab, right] {embeddings};
+  % ---- arrows: online (dashed = query-time read of offline store) ----
+  \draw[line] (q.east) -- (dr.west)
+      node[lab, above, pos=0.5] {query};
+  \draw[line] (q.south east) -- (lex.west)
+      node[lab, below, pos=0.5] {query};
+  \draw[queryline] (vs.south) to[out=-90, in=90] (dr.north)
+      node[lab, pos=0.3] {search};
+  \draw[line] (dr.east) -- (rrf.west)
+      node[lab, above] {ranking};
+  \draw[line] (lex.east) -- (rrf.west)
+      node[lab, below] {ranking};
+  \draw[line] (rrf.east) -- (gen.west)
+      node[lab, above] {top-$k$};
+  \draw[line] (gen.east) -- (ans.west)
+      node[lab, above] {answer};
+  % ---- phase bands ----
+  \begin{scope}[on background layer]
+    \node[phase, fit=(kb)(chunk)(vs)(emb), inner sep=1.5em] (offline) {};
+    \node[phase, fit=(q)(dr)(lex)(rrf)(gen)(ans), inner sep=1.5em] (online) {};
+    \node[phaselabel, anchor=south west, xshift=3pt, yshift=-3pt]
+      at (offline.north west) {OFFLINE --- indexing};
+    \node[phaselabel, anchor=south west, xshift=3pt, yshift=-3pt]
+      at (online.north west) {ONLINE --- querying};
+  \end{scope}
+\end{tikzpicture}}
+\caption{Chirag architecture. \emph{Offline}, the knowledge base is chunked,
+embedded, and indexed once into a persistent vector store. \emph{Online}, a
+query is scored by dense and lexical retrievers, fused with reciprocal-rank
+fusion, and answered by a grounded generator that returns inline citations.}
 \label{fig:arch}
 \end{figure}
 

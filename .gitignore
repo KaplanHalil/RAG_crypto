@@ -25,3 +25,11 @@ paper/iacrcc/
 paper/build/
 paper/main.pdf
 paper/main.meta
+
+# Presentation auxiliaries
+docs/*.aux
+docs/*.log
+docs/*.out
+docs/*.nav
+docs/*.snm
+docs/*.toc
